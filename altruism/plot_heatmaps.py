@@ -7,10 +7,20 @@ from tkinter import ttk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # Load results
-df = pd.read_csv('grid_search_results_2.csv')
+df = pd.read_csv('altruism/grid_search_results.csv')
 
 
-def plot_heatmap_embedded(df, x, y, fixed, value='coexist_prob', aggfunc='mean', cmap='viridis', canvas=None, fig=None):
+def plot_heatmap_embedded(
+                    df,
+                    x,
+                    y,
+                    fixed,
+                    value='coexist_prob',
+                    aggfunc='mean',
+                    cmap='viridis',
+                    canvas=None,
+                    fig=None
+                ):
     dff = df.copy()
     for k, v in fixed.items():
         dff = dff[dff[k] == v]
@@ -67,12 +77,20 @@ root.title("Altruism Grid Search Heatmap")
 frame = ttk.Frame(root, padding=10)
 frame.pack(side=tk.LEFT, fill=tk.Y)
 
-ttk.Label(frame, text="Select harshness:", font=("Helvetica", 18, "bold")).pack(anchor=tk.W, pady=5)
+ttk.Label(
+    frame, text="Select harshness:",
+    font=("Helvetica", 18, "bold")
+).pack(anchor=tk.W, pady=5)
 harshness_var = tk.StringVar(value=str(harshness_options[0]))
 
 
 radio_style = ttk.Style()
-radio_style.configure('Big.TRadiobutton', font=('Helvetica', 16), indicatorsize=20, padding=10)
+radio_style.configure(
+    'Big.TRadiobutton',
+    font=('Helvetica', 16),
+    indicatorsize=20,
+    padding=10
+)
 
 for h in harshness_options:
     ttk.Radiobutton(
