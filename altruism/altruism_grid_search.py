@@ -35,10 +35,11 @@ def main():
 
     # Fine grid around coexistence point
     grid = {
-        'benefit_from_altruism': [clamp(round(x, 2)) for x in np.arange(0.10, 0.19 + 0.01, 0.01)],
+        'benefit_from_altruism': [clamp(round(x, 2)) for x in np.arange(0.00, 1.00 + 0.01, 0.01)],
         'cost_of_altruism': [clamp(round(x, 2)) for x in np.arange(0.00, 0.35 + 0.01, 0.01)],
         'disease': [0.26],
-        'harshness': [clamp(round(x, 2)) for x in np.arange(0.85, 0.95 + 0.01, 0.01)]  # 0.85, 0.86, ..., 0.89
+        'harshness': [0.80],
+        # [clamp(round(x, 2)) for x in np.arange(0.85, 0.95 + 0.01, 0.01)]  # 0.85, 0.86, ..., 0.89
     }
     param_names = list(grid.keys())
     param_combos = list(itertools.product(*[grid[k] for k in param_names]))
@@ -47,10 +48,10 @@ def main():
     import os
     found = 0
     n_reps = 10  # Number of replicates per parameter set (increase for finer probability resolution)
-    csv_path = 'grid_search_results_2.csv'
+    csv_path = 'altruism/grid_search_results.csv'
     completed = set()
     import pandas as pd
-    # Only read completed parameter sets from grid_search_results_2.csv
+    # Only read completed parameter sets from grid_search_results.csv
     if os.path.exists(csv_path):
         try:
             df_conv = pd.read_csv(csv_path)
