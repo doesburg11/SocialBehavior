@@ -38,7 +38,7 @@ def main():
         'benefit_from_altruism': [clamp(round(x, 2)) for x in np.arange(0.00, 1.00 + 0.01, 0.01)],
         'cost_of_altruism': [clamp(round(x, 2)) for x in np.arange(0.00, 0.35 + 0.01, 0.01)],
         'disease': [0.26],
-        'harshness': [0.80],
+        'harshness': [0.50, 0.60, 0.70],
         # [clamp(round(x, 2)) for x in np.arange(0.85, 0.95 + 0.01, 0.01)]  # 0.85, 0.86, ..., 0.89
     }
     param_names = list(grid.keys())
