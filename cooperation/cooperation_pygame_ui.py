@@ -35,7 +35,7 @@ WHITE = (255, 255, 255)
 GRAY = (200, 200, 200)
 
 class Slider:
-    def __init__(self, x, y, w, label, minval, maxval, value, font, param_name):
+    def __init__(self, x, y, w, label, minval, maxval, value, font, param_name, step=1.0):
         self.x = x
         self.y = y
         self.w = w
@@ -46,6 +46,7 @@ class Slider:
         self.value = value
         self.font = font
         self.param_name = param_name
+        self.step = step
         self.dragging = False
         self.editing = False
         self.text = f"{self.value:.2f}"
@@ -91,8 +92,10 @@ class Slider:
             self.dragging = False
         elif event.type == pygame.MOUSEMOTION and self.dragging:
             relx = min(max(event.pos[0] - self.rect.x, 0), self.rect.w)
-            self.value = self.minval + (self.maxval-self.minval)*relx/self.rect.w
-            self.value = min(max(self.value, self.minval), self.maxval)
+            raw_value = self.minval + (self.maxval-self.minval)*relx/self.rect.w
+            # Snap to step size
+            steps = round((raw_value - self.minval) / self.step)
+            self.value = min(max(self.minval + steps * self.step, self.minval), self.maxval)
             self.text = f"{self.value:.2f}"
             return True
         if self.editing:
@@ -101,7 +104,9 @@ class Slider:
                     try:
                         v = float(self.text)
                         v = min(max(v, self.minval), self.maxval)
-                        self.value = v
+                        # Snap to step size
+                        steps = round((v - self.minval) / self.step)
+                        self.value = self.minval + steps * self.step
                     except ValueError:
                         pass
                     self.editing = False
@@ -202,19 +207,19 @@ def main():
     slider_x = WIDTH + 30  # Increased from 10 to 30 for more space
     slider_y = 10
     sliders = [
-        Slider(slider_x, slider_y + i * slider_gap, 220, label, minv, maxv, val, font, pname)
-        for i, (label, minv, maxv, val, pname) in enumerate([
-            ('initial-cows', 0, 100, initial_cows, 'initial_cows'),
-            ('cooperative-probability', 0.0, 1.0, cooperative_probability, 'cooperative_probability'),
-            ('reproduction-cost', 0, 99, reproduction_cost, 'reproduction_cost'),
-            ('reproduction-threshold', 0, 200, reproduction_threshold, 'reproduction_threshold'),
-            ('stride-length', 0, 0.3, stride_length, 'stride_length'),
-            ('metabolism', 0, 99, metabolism, 'metabolism'),
-            ('high-growth-chance', 0, 99, high_growth_chance, 'high_growth_chance (%)'),
-            ('low-growth-chance', 0, 99, low_growth_chance, 'low_growth_chance (%)'),
-            ('grass-energy', 0, 200, grass_energy, 'grass_energy'),
-            ('max-grass-height', 1, 40, max_grass_height, 'max_grass_height'),
-            ('low-high-threshold', 0, 99, low_high_threshold, 'low_high_threshold'),
+        Slider(slider_x, slider_y + i * slider_gap, 220, label, minv, maxv, val, font, pname, step)
+        for i, (label, minv, maxv, val, pname, step) in enumerate([
+            ('initial-cows', 0, 100, initial_cows, 'initial_cows', 1),
+            ('cooperative-probability', 0.0, 1.0, cooperative_probability, 'cooperative_probability', 0.01),
+            ('stride-length', 0, 0.3, stride_length, 'stride_length', 0.01),
+            ('metabolism', 0, 99, metabolism, 'metabolism', 1),
+            ('reproduction-threshold', 0, 200, reproduction_threshold, 'reproduction_threshold', 1),
+            ('reproduction-cost', 0, 99, reproduction_cost, 'reproduction_cost', 1),
+            ('high-growth-chance', 0, 99, high_growth_chance, 'high_growth_chance', 1),
+            ('low-growth-chance', 0, 99, low_growth_chance, 'low_growth_chance', 1),
+            ('grass-energy', 0, 200, grass_energy, 'grass_energy', 1),
+            ('max-grass-height', 1, 40, max_grass_height, 'max_grass_height', 1),
+            ('low-high-threshold', 0, 99, low_high_threshold, 'low_high_threshold', 1),
         ])
     ]
     # Place buttons below the last slider
