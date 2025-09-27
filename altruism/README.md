@@ -1,6 +1,6 @@
-# Altruism Model (Python)
+# Altruism Model
 
-A faithful, vectorized Python/NumPy port of a NetLogo patch-based altruism simulation. Includes a Pygame UI for interactive exploration and Matplotlib plotting for population dynamics.
+A vectorized Python/NumPy port of a NetLogo patch-based altruism simulation. Includes a Pygame UI for interactive exploration and Matplotlib plotting for population dynamics.
 
 ## Features
 - **Patch-based grid model**: Each cell can be empty (black), selfish (green), or altruist (pink)
