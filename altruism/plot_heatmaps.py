@@ -11,16 +11,16 @@ df = pd.read_csv('altruism/grid_search_results.csv')
 
 
 def plot_heatmap_embedded(
-                    df,
-                    x,
-                    y,
-                    fixed,
-                    value='coexist_prob',
-                    aggfunc='mean',
-                    cmap='viridis',
-                    canvas=None,
-                    fig=None
-                ):
+    df,
+    x,
+    y,
+    fixed,
+    value='coexist_prob',
+    aggfunc='mean',
+    cmap='viridis',
+    canvas=None,
+    fig=None
+):
     dff = df.copy()
     for k, v in fixed.items():
         dff = dff[dff[k] == v]
