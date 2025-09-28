@@ -89,7 +89,7 @@ radio_style.configure(
     'Big.TRadiobutton',
     font=('Helvetica', 16),
     indicatorsize=20,
-    padding=10
+    padding=0  # <-- Minimal padding for tightest spacing
 )
 
 for h in harshness_options:
@@ -100,7 +100,7 @@ for h in harshness_options:
         value=str(h),
         command=on_harshness_change,
         style='Big.TRadiobutton'
-    ).pack(anchor=tk.W, pady=2)
+    ).pack(anchor=tk.W, pady=0)  # <-- No extra vertical space between buttons
 
 # Matplotlib figure and canvas
 fig = plt.Figure(figsize=(8, 6))
