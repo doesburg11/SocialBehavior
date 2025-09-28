@@ -1,94 +1,83 @@
-# 3D surface plot of coexistence probability = 1 as a function of b, c, and harshness (fixed disease) using Plotly
+# Interpolated 3D body of coexistence probability = 1 as a function of b, c, and harshness (fixed disease) using Plotly
 import pandas as pd
 import numpy as np
-import torch
-import torch.nn as nn
-import torch.optim as optim
 import plotly.graph_objects as go
+from scipy.interpolate import griddata
 
 # Load results
 df = pd.read_csv('altruism/grid_search_results.csv')
 
-# Filter for fixed disease and coexistence probability = 1
+# Filter for fixed disease
 fixed_disease = 0.26
-surface_df = df[(df['disease'] == fixed_disease) & (df['coexist_prob'] == 1)]
+body_df = df[df['disease'] == fixed_disease]
 
 # Prepare data
-b = surface_df['benefit_from_altruism'].values
-c = surface_df['cost_of_altruism'].values
-h = surface_df['harshness'].values
+b = body_df['benefit_from_altruism'].values
+c = body_df['cost_of_altruism'].values
+h = body_df['harshness'].values
+coexist = body_df['coexist_prob'].values
 
-X = np.column_stack((b, c)).astype(np.float32)
-y = h.astype(np.float32)
-X_tensor = torch.from_numpy(X)
-y_tensor = torch.from_numpy(y)
+# Create a dense 3D grid
+b_grid = np.linspace(b.min(), b.max(), 40)
+c_grid = np.linspace(c.min(), c.max(), 40)
+h_grid = np.linspace(h.min(), h.max(), 40)
+B, C, H = np.meshgrid(b_grid, c_grid, h_grid, indexing='ij')
 
+# Interpolate coexist_prob onto the grid (use 'nearest' for robustness)
+points = np.column_stack((b, c, h))
+values = coexist
+coexist_interp = griddata(points, values, (B, C, H), method='nearest', fill_value=0)
 
-# Define a simpler neural network
-class Net(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.fc1 = nn.Linear(2, 30)
-        self.fc2 = nn.Linear(30, 1)
+# Radio button values for coexist_prob isosurface
+harshness_options = [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 0.99]
 
-    def forward(self, x):
-        x = torch.relu(self.fc1(x))
-        x = self.fc2(x)
-        return x.squeeze(-1)
+# Create Plotly figure with updatemenus (radio buttons)
+fig = go.Figure()
 
+for hval in harshness_options:
+    fig.add_trace(go.Isosurface(
+        x=B.flatten(),
+        y=C.flatten(),
+        z=H.flatten(),
+        value=coexist_interp.flatten(),
+        isomin=hval,
+        isomax=hval + 0.01,
+        surface_count=1,
+        colorscale='Turbo',
+        opacity=0.6,
+        caps=dict(x_show=False, y_show=False, z_show=False),
+        visible=(hval == harshness_options[0]),  # Only first is visible by default
+        name=f'coexist_prob={hval}'
+    ))
 
-net = Net()
-criterion = nn.MSELoss()
-optimizer = optim.Adam(net.parameters(), lr=0.01)
-
-# Train neural network
-for epoch in range(2000):
-    optimizer.zero_grad()
-    outputs = net(X_tensor)
-    loss = criterion(outputs, y_tensor)
-    loss.backward()
-    optimizer.step()
-    if epoch % 200 == 0:
-        print(f"Epoch {epoch}, Loss: {loss.item():.4f}")
-
-# Create grid for smooth surface
-b_grid = np.linspace(b.min(), b.max(), 50)
-c_grid = np.linspace(c.min(), c.max(), 50)
-B, C = np.meshgrid(b_grid, c_grid)
-X_grid = np.column_stack((B.ravel(), C.ravel())).astype(np.float32)
-X_grid_tensor = torch.from_numpy(X_grid)
-with torch.no_grad():
-    H_pred = net(X_grid_tensor).numpy().reshape(B.shape)
-    H_pred = np.clip(H_pred, 0.0, 1.0)
-
-# Plotly surface plot
-fig = go.Figure(data=[
-    go.Surface(
-        x=B,
-        y=C,
-        z=H_pred,
-        colorscale='YlOrBr',
-        opacity=0.8,
-        colorbar=dict(title='Harshness')
-    ),
-    go.Scatter3d(
-        x=b,
-        y=c,
-        z=h,
-        mode='markers',
-        marker=dict(size=4, color='red'),
-        name='Data points (p=1)'
-    )
-])
-
+# Add radio buttons to toggle isosurfaces
 fig.update_layout(
+    updatemenus=[
+        dict(
+            type="buttons",
+            direction="down",
+            buttons=[
+                dict(
+                    label=f"coexist_prob = {hval}",
+                    method="update",
+                    args=[{"visible": [hval == opt for opt in harshness_options]}]
+                ) for hval in harshness_options
+            ],
+            pad={"r": 10, "t": 10},
+            showactive=True,
+            x=0.02,
+            xanchor="left",
+            y=0.98,
+            yanchor="top"
+        )
+    ],
     scene=dict(
         xaxis_title='Benefit from altruism (b)',
         yaxis_title='Cost of altruism (c)',
         zaxis_title='Harshness',
         zaxis=dict(range=[0, 1])
     ),
-    title='Coexistence Probability = 1 Surface (PyTorch NN)<br>(disease = 0.26)'
+    title='Select coexist_prob isosurface (disease = 0.26)'
 )
 
 fig.show()
