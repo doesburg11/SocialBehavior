@@ -23,16 +23,19 @@ y = h.astype(np.float32)
 X_tensor = torch.from_numpy(X)
 y_tensor = torch.from_numpy(y)
 
+
 # Define a simpler neural network
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
         self.fc1 = nn.Linear(2, 30)
         self.fc2 = nn.Linear(30, 1)
+
     def forward(self, x):
         x = torch.relu(self.fc1(x))
         x = self.fc2(x)
         return x.squeeze(-1)
+
 
 net = Net()
 criterion = nn.MSELoss()
