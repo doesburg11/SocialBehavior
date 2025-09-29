@@ -1,6 +1,6 @@
 # Altruism Model
 
-A vectorized Python/NumPy port of a NetLogo patch-based altruism simulation. Includes a Pygame UI for interactive exploration and Matplotlib plotting for population dynamics.
+A vectorized Python/NumPy port of BEAGLE's evolutionary altruism model. It models population genetics with respect to the fitness of traits that are affected by social and environmental conditions. The model has two types of patch agents: altruistic and selfish agents. Includes a Pygame UI for interactive exploration and Matplotlib plotting for population dynamics.
 
 ## Features
 - **Patch-based grid model**: Each cell can be empty (black), selfish (green), or altruist (pink)
