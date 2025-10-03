@@ -1,0 +1,12 @@
+# Minimal requirements to run the Altruism model and UI
+numpy
+matplotlib
+pygame
+
+# Optional: heatmaps and grid-search visualization
+# pandas
+# seaborn
+
+# Optional: Plotly 3D surfaces
+# plotly
+# scipy
