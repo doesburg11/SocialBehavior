@@ -1,3 +1,4 @@
 {
-    "python.defaultInterpreterPath": "/home/doesburg/Projects/Cooperation/.conda/bin/python"
+    "python.defaultInterpreterPath": "/home/doesburg/Projects/SocialBehavior/.conda/bin/python",
+    "python.terminal.activateEnvironment": true
 }
