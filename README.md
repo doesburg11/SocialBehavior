@@ -2,6 +2,25 @@
 
 A collection of agent-based models exploring human social behavior. Includes interactive UIs and grid search tools for parameter exploration.
 
+## Environments
+This repo uses a project-local Conda environment stored at `.conda/` so it travels with the workspace and VS Code can auto-select it.
+
+- Interpreter path: `/home/doesburg/Projects/SocialBehavior/.conda/bin/python`
+- VS Code setting: see `.vscode/settings.json` (we set `python.defaultInterpreterPath` and enable terminal activation)
+
+Activate the environment in a terminal when running commands manually:
+```bash
+source ./.conda/bin/activate
+# or run without activation using the interpreter directly:
+./.conda/bin/python -m pip install -r altruism/requirements.txt
+./.conda/bin/python altruism/altruism_model.py
+```
+
+If you see a “bad interpreter” error, regenerate entry scripts (pip, etc.) with:
+```bash
+./.conda/bin/python -m pip install --upgrade --force-reinstall pip setuptools wheel
+```
+
 ## Models
 
 ### Altruism Model
