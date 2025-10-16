@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Altruism Model",
+      "type": "shell",
+      "command": "conda run -p /home/doesburg/Projects/SocialBehavior/.conda python altruism/altruism_model.py --steps 10",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Cooperation Model",
+      "type": "shell",
+      "command": "conda run -p /home/doesburg/Projects/SocialBehavior/.conda python cooperation/cooperation_model.py --steps 10",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Altruism Pygame UI",
+      "type": "shell",
+      "command": "conda run -p /home/doesburg/Projects/SocialBehavior/.conda python altruism/altruism_pygame_ui.py",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Cooperation Pygame UI",
+      "type": "shell",
+      "command": "conda run -p /home/doesburg/Projects/SocialBehavior/.conda python cooperation/cooperation_pygame_ui.py",
+      "group": "build",
+      "problemMatcher": []
+    }
+  ]
+}
