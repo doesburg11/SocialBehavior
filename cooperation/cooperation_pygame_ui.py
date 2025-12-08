@@ -2,10 +2,10 @@ import pygame
 import numpy as np
 import matplotlib.pyplot as plt
 from cooperation_model import (
-    CooperationModel, 
-    cooperative_probability, 
-    initial_cows, 
-    high_growth_chance,     
+    CooperationModel,
+    cooperative_probability,
+    initial_cows,
+    high_growth_chance,
     low_growth_chance,
     reproduction_cost,
     reproduction_threshold,
@@ -33,6 +33,7 @@ RED = (255, 0, 0)
 SKY = (135, 206, 235)
 WHITE = (255, 255, 255)
 GRAY = (200, 200, 200)
+
 
 class Slider:
     def __init__(self, x, y, w, label, minval, maxval, value, font, param_name, step=1.0):
@@ -76,7 +77,9 @@ class Slider:
             val_surf = self.font.render(self.text, True, (0, 0, 255))
         else:
             val_surf = self.font.render(f'{self.value:.2f}', True, (0, 0, 0))
-        screen.blit(val_surf, (self.value_rect.x + 6, self.value_rect.y + (self.value_rect.height - val_surf.get_height()) // 2))
+        screen.blit(val_surf, (
+            self.value_rect.x + 6, self.value_rect.y + (self.value_rect.height - val_surf.get_height()) // 2
+            ))
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -123,6 +126,7 @@ class Slider:
                 return True
         return False
 
+
 class ModelUI:
     def __init__(self):
         self.model = CooperationModel()
@@ -146,6 +150,7 @@ class ModelUI:
         for _ in range(steps):
             self.step()
 
+
 def draw_grid(screen, model):
     grass = model.grass_patch.grass
     for y in range(GRID_SIZE):
@@ -165,9 +170,11 @@ def draw_grid(screen, model):
     for y in range(1, GRID_SIZE):
         pygame.draw.line(screen, GRAY, (0, y*CELL_SIZE), (WIDTH, y*CELL_SIZE))
 
+
 def draw_text(screen, text, pos, font, color=BLACK):
     surf = font.render(text, True, color)
     screen.blit(surf, pos)
+
 
 def plot_history(history):
     plt.clf()
@@ -193,6 +200,7 @@ def plot_history(history):
     if img.get_width() > max_width or img.get_height() > max_height:
         img = pygame.transform.smoothscale(img, (max_width, max_height))
     return img
+
 
 def main():
     pygame.init()
@@ -228,12 +236,14 @@ def main():
     reset_rect = pygame.Rect(slider_x + 110, last_slider_y, 100, 36)
     plot_toggle_rect = pygame.Rect(slider_x, last_slider_y + 50, 100, 36)
     step_button_rect = pygame.Rect(slider_x + 110, last_slider_y + 50, 100, 36)
+
     def update_plot():
         # Only update the plot image if the plot is visible
         if plot_visible[0]:
             plot_img_holder[0] = plot_history(model_ui.history)
         else:
             plot_img_holder[0] = None
+
     def reset_and_update_plot():
         model_ui.reset()
         plot_visible[0] = False
@@ -302,7 +312,12 @@ def main():
         pygame.draw.rect(screen, (100, 100, 200), reset_rect, border_radius=8)
         reset_surf = font.render('Reset', True, (255, 255, 255))
         screen.blit(reset_surf, (reset_rect.x+18, reset_rect.y+8))
-        pygame.draw.rect(screen, (120, 120, 220) if plot_visible[0] else (180, 180, 180), plot_toggle_rect, border_radius=8)
+        pygame.draw.rect(
+            screen,
+            (120, 120, 220) if plot_visible[0] else (180, 180, 180),
+            plot_toggle_rect,
+            border_radius=8
+        )
         plot_label = 'Plot: ON' if plot_visible[0] else 'Plot: OFF'
         plot_surf = font.render(plot_label, True, (255, 255, 255))
         screen.blit(plot_surf, (plot_toggle_rect.x+10, plot_toggle_rect.y+8))
@@ -326,6 +341,7 @@ def main():
         pygame.display.flip()
         clock.tick(FPS)
     pygame.quit()
+
 
 if __name__ == '__main__':
     main()
