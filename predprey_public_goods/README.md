@@ -35,7 +35,9 @@ and provides a theoretical interpretation using:
 
 ## Population Oscillations
 
-![Population Oscillations](../assets/predprey_public_goods/01_population_oscillations.png)
+<p align="center">
+  <img src="../assets/predprey_public_goods/01_population_oscillations.png" alt="Population Oscillations" width="400">
+</p>
 
 Observed in the current chart:
 
@@ -47,7 +49,9 @@ This is consistent with spatially perturbed Lotka--Volterra-like coupling.
 
 ## Phase Plot (Predators vs Prey)
 
-![Phase Plot](../assets/predprey_public_goods/02_phase_plot.png)
+<p align="center">
+  <img src="../assets/predprey_public_goods/02_phase_plot.png" alt="Variance Heatmap" width="400">
+</p>
 
 Observed in the current chart:
 
@@ -73,7 +77,9 @@ This run does not show fixation at 1.0.
 
 ## Trait Variance
 
-![Variance](../assets/predprey_public_goods/04_trait_variance.png)
+<p align="center">
+  <img src="../assets/predprey_public_goods/04_trait_variance.png" alt="Variance Heatmap" width="400">
+</p>
 
 Observed in the current chart:
 
@@ -148,7 +154,9 @@ Empirically, the current trajectory is consistent with:
 
 ## Local Clustering Heatmap
 
-![Clustering Heatmap](../assets/predprey_public_goods/05_clustering_heatmap.png)
+<p align="center">
+  <img src="../assets/predprey_public_goods/05_clustering_heatmap.png" alt="Clustering Heatmap" width="400">
+</p>
 
 Observed in the current chart:
 
@@ -158,7 +166,9 @@ Observed in the current chart:
 
 ## Live Grid Snapshot
 
-![Live Grid](../assets/predprey_public_goods/06_live_grid.png)
+<p align="center">
+  <img src="../assets/predprey_public_goods/06_live_grid.png" alt="Live Grid" width="400">
+</p>
 
 Observed in the current snapshot:
 
@@ -187,7 +197,9 @@ That mechanism is compatible with stable intermediate cooperation.
 
 # 8. Trait Reference View (Selected Chart)
 
-![Mean Cooperation Reference](../assets/predprey_public_goods/03_trait_mean.png)
+<p align="center">
+  <img src="../assets/predprey_public_goods/03_trait_mean.png" alt="Trait mean" width="400">
+</p>
 
 This selected reference chart shows:
 
@@ -204,7 +216,9 @@ Metric per cell: mean cooperation over tail window, averaged across successful r
 
 ## Round 1 (broad scan)
 
-![Sweep Round 1](images/coop_cost_p0_heatmap_r1.png)
+<p align="center">
+  <img src="../assets/predprey_public_goods/coop_cost_p0_heatmap_r1.png" alt="[Sweep Round 1" width="400">
+</p>
 
 Observed pattern:
 
@@ -215,7 +229,9 @@ Observed pattern:
 
 ## Round 2 (high-cost/high-`P0` refinement)
 
-![Sweep Round 2](images/coop_cost_p0_heatmap_r2.png)
+<p align="center">
+  <img src="../assets/predprey_public_goods/coop_cost_p0_heatmap_r2.png" alt="[Sweep Round 12" width="400">
+</p>
 
 Observed pattern:
 
@@ -224,7 +240,9 @@ Observed pattern:
 
 ## Round 3 (moderate-`P0`, lower-cost refinement)
 
-![Sweep Round 3](images/coop_cost_p0_heatmap_r3.png)
+<p align="center">
+  <img src="../assets/predprey_public_goods/coop_cost_p0_heatmap_r3.png" alt="[Sweep Round 3" width="540">
+</p>
 
 Observed pattern:
 
