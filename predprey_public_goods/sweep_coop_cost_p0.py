@@ -231,11 +231,11 @@ def save_heatmap(
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--coop-min", type=float, default=0.15)
-    ap.add_argument("--coop-max", type=float, default=0.20)
+    ap.add_argument("--coop-min", type=float, default=0.00)
+    ap.add_argument("--coop-max", type=float, default=1.00)
     ap.add_argument("--coop-step", type=float, default=0.01)
-    ap.add_argument("--p0-min", type=float, default=0.05)
-    ap.add_argument("--p0-max", type=float, default=0.35)
+    ap.add_argument("--p0-min", type=float, default=0.00)
+    ap.add_argument("--p0-max", type=float, default=1.00)
     ap.add_argument("--p0-step", type=float, default=0.01)
     ap.add_argument("--successes", type=int, default=10)
     ap.add_argument("--max-attempts", type=int, default=100)
