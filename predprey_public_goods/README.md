@@ -440,3 +440,31 @@ This section documents the exact update order used in
   predator count history, prey count history, mean/variance cooperation history,
   optional animation snapshots, final predator list, `success` flag, and
   `extinction_step`.
+
+------------------------------------------------------------------------
+
+# 17. One-Tick Worked Example (Visual)
+
+This diagram visualizes one concrete tick using the same numeric example used
+to explain the update logic.
+
+![One Tick Worked Example](../assets/predprey_public_goods/tick_logic_example.svg)
+
+## Gridworld View of the Same Tick
+
+This version shows the same numerical example in a concrete local grid:
+
+- Predators `A,B,C` occupy one cell.
+- The highlighted blue square is the `HUNT_R=1` neighborhood used to collect
+  prey candidates.
+- Left panel: before hunt (all candidate prey present).
+- Right panel: after hunt, where one candidate prey is removed because
+  `draw < p_kill`.
+
+![One Tick Gridworld](../assets/predprey_public_goods/tick_logic_gridworld.svg)
+
+To regenerate:
+
+```bash
+python predprey_public_goods/visualize_tick_logic.py
+```
