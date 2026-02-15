@@ -246,7 +246,7 @@ def main() -> None:
     ap.add_argument("--outfile", type=str, default="./predprey_public_goods/images/coop_cost_p0_heatmap.png")
 
     # Adaptive refinement
-    ap.add_argument("--adaptive", action=argparse.BooleanOptionalAction, default=True)
+    ap.add_argument("--adaptive", action=argparse.BooleanOptionalAction, default=False)
     ap.add_argument("--rounds", type=int, default=3)
     ap.add_argument("--top-k", type=int, default=5)
     ap.add_argument("--min-success-rate", type=float, default=1.0)

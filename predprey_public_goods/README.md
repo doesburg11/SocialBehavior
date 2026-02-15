@@ -28,6 +28,7 @@ and provides a theoretical interpretation using:
 13. Key Parameter Settings
 14. Next Directions
 15. Mathematical Derivation (Current Reward Rule)
+16. Simulation Logic (Code-Level)
 
 ------------------------------------------------------------------------
 
@@ -280,7 +281,7 @@ Core ecology/trait figures are generated from:
 
 Sweep figures are generated from:
 
-- `predprey_public_goods/sweep_coop_cost_p0.py`
+- `predprey_public_goods/sweep_p0_prey_repro.py`
 
 Animation layers:
 
@@ -296,7 +297,7 @@ From repo root:
 
 ```bash
 python predprey_public_goods/emerging_cooperation.py
-python predprey_public_goods/sweep_coop_cost_p0.py
+python predprey_public_goods/sweep_p0_prey_repro.py
 ```
 
 Notes:
@@ -322,7 +323,7 @@ Defaults in `predprey_public_goods/emerging_cooperation.py`:
 - Prey: `PREY_MOVE_PROB=0.25`, `PREY_REPRO_PROB=0.04`, `PREY_MAX=1600`
 - Clustering radius: `CLUST_R=2`
 
-Defaults in `predprey_public_goods/sweep_coop_cost_p0.py`:
+Defaults in `predprey_public_goods/sweep_p0_prey_repro.py`:
 
 - `COOP_COST` range: `0.00-1.00` (step `0.01`)
 - `P0` range: `0.00-1.00` (step `0.01`)
@@ -375,3 +376,67 @@ Condition for local selection favoring more cooperation:
 
 Because the benefit term decreases with `S_g` (saturation) while cost remains
 linear, interior cooperation regimes are expected in broad parameter regions.
+
+------------------------------------------------------------------------
+
+# 16. Simulation Logic (Code-Level)
+
+This section documents the exact update order used in
+`predprey_public_goods/emerging_cooperation.py`.
+
+## State Variables
+
+- Predator agent: `(x, y, energy, coop)` where `coop in [0,1]`.
+- Prey agent: `(x, y)`.
+- Space is a wrapped torus (`wrap`), so movement beyond an edge re-enters on
+  the opposite side.
+
+## Per-Tick Update Order
+
+1. Prey movement and prey reproduction.
+2. Build spatial indexes for prey and predators.
+3. Predator hunting and energy gain.
+4. Remove killed prey.
+5. Predator costs, movement, reproduction, mutation, death.
+
+## Prey Dynamics
+
+- Each prey moves with probability `PREY_MOVE_PROB` by a local step in
+  `{ -1, 0, 1 }` for x and y.
+- Reproduction is density-limited by:
+  `repro_scale = max(0, 1 - prey_count / PREY_MAX)`.
+- Birth probability per prey per tick is:
+  `PREY_REPRO_PROB * repro_scale`.
+- New prey spawn in a local neighborhood around the parent.
+
+## Hunting Logic
+
+- Predators are grouped by current cell.
+- For each predator-occupied cell `(cx, cy)`, candidate prey are collected from
+  all cells in a square neighborhood radius `HUNT_R` (Chebyshev radius).
+- Let `S = sum(coop_i)` over predators in that cell. Kill probability is:
+  `p_kill = 1 - (1 - P0)^S`.
+- If a kill occurs, one prey candidate is removed.
+- Kill reward is shared equally among hunters in that cell:
+  `share = KILL_ENERGY / n_hunters`.
+
+## Predator Energy, Reproduction, Mutation
+
+- Each predator pays per tick:
+  `METAB_PRED + MOVE_COST + COOP_COST * coop`.
+- Predators then move by a local wrapped step.
+- If `energy >= BIRTH_THRESH_PRED`, predator reproduces:
+  energy is halved; child inherits parent trait and local position.
+- Child mutates with probability `MUT_RATE`:
+  `coop_child = clamp01(coop_parent + Normal(0, MUT_SIGMA))`.
+- Predators with `energy <= 0` are removed.
+
+## Run Termination and Outputs
+
+- A run stops early if either predators or prey go extinct (`pred_n == 0` or
+  `prey_n == 0`); this is an extinction run.
+- A run is marked successful only if no extinction occurs before `STEPS`.
+- Recorded outputs include:
+  predator count history, prey count history, mean/variance cooperation history,
+  optional animation snapshots, final predator list, `success` flag, and
+  `extinction_step`.
