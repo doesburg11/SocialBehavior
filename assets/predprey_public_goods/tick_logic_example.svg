@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="820" viewBox="0 0 1280 820">
+<rect x="0" y="0" width="1280" height="820" fill="#f7f8fb" stroke="none" stroke-width="0.0" rx="0" />
+<text text-anchor="middle" x="640.0" y="42" font-family="Arial" font-size="28" font-weight="700" fill="#101820">Predator-Public-Goods Model: One Tick Worked Example</text>
+<rect x="40" y="80" width="570" height="300" fill="#ffffff" stroke="#d6d6d6" stroke-width="1.5" rx="8" />
+<text x="54" y="108" font-family="Arial" font-size="18" font-weight="700" fill="#1f1f1f">1) Inputs + Formula</text>
+<rect x="650" y="80" width="570" height="300" fill="#ffffff" stroke="#d6d6d6" stroke-width="1.5" rx="8" />
+<text x="664" y="108" font-family="Arial" font-size="18" font-weight="700" fill="#1f1f1f">2) Hunt Decision</text>
+<rect x="40" y="420" width="570" height="320" fill="#ffffff" stroke="#d6d6d6" stroke-width="1.5" rx="8" />
+<text x="54" y="448" font-family="Arial" font-size="18" font-weight="700" fill="#1f1f1f">3) Energy Update</text>
+<rect x="650" y="420" width="570" height="320" fill="#ffffff" stroke="#d6d6d6" stroke-width="1.5" rx="8" />
+<text x="664" y="448" font-family="Arial" font-size="18" font-weight="700" fill="#1f1f1f">4) Reproduction Check</text>
+<text x="60" y="142" font-family="Arial" font-size="16" font-weight="600" fill="#222222">Predators in same cell:</text>
+<circle cx="130" cy="192" r="22" fill="#ffffff" stroke="#2f5d8c" stroke-width="2.5" />
+<text text-anchor="middle" x="130" y="197" font-family="Arial" font-size="14" font-weight="700" fill="#2f5d8c">A</text>
+<text x="94" y="232" font-family="Arial" font-size="12" font-weight="400" fill="#3a3a3a">coop=0.2</text>
+<text x="94" y="250" font-family="Arial" font-size="12" font-weight="400" fill="#3a3a3a">E0=1.8</text>
+<circle cx="250" cy="192" r="22" fill="#ffffff" stroke="#2f5d8c" stroke-width="2.5" />
+<text text-anchor="middle" x="250" y="197" font-family="Arial" font-size="14" font-weight="700" fill="#2f5d8c">B</text>
+<text x="214" y="232" font-family="Arial" font-size="12" font-weight="400" fill="#3a3a3a">coop=0.6</text>
+<text x="214" y="250" font-family="Arial" font-size="12" font-weight="400" fill="#3a3a3a">E0=2.4</text>
+<circle cx="370" cy="192" r="22" fill="#ffffff" stroke="#2f5d8c" stroke-width="2.5" />
+<text text-anchor="middle" x="370" y="197" font-family="Arial" font-size="14" font-weight="700" fill="#2f5d8c">C</text>
+<text x="334" y="232" font-family="Arial" font-size="12" font-weight="400" fill="#3a3a3a">coop=0.9</text>
+<text x="334" y="250" font-family="Arial" font-size="12" font-weight="400" fill="#3a3a3a">E0=1.1</text>
+<text x="60" y="280" font-family="Courier New" font-size="15" font-weight="400" fill="#222222">Hunt rule: p_kill = 1 - (1 - P0)^S</text>
+<text x="60" y="306" font-family="Courier New" font-size="15" font-weight="400" fill="#222222">P0=0.18, S=sum(coop)=1.7</text>
+<text x="60" y="332" font-family="Courier New" font-size="15" font-weight="700" fill="#1c4e80">p_kill=0.286</text>
+<rect x="720" y="225" width="420" height="34" fill="#e8edf3" stroke="#bcc8d6" stroke-width="1.2" rx="4" />
+<rect x="720" y="225" width="120.26818781679525" height="34" fill="#4c78a8" stroke="none" stroke-width="0.0" rx="4" />
+<line x1="808.2" y1="205" x2="808.2" y2="279" stroke="#e45756" stroke-width="2.5" stroke-dasharray="8,6" />
+<text x="720" y="197" font-family="Arial" font-size="12" font-weight="400" fill="#616161">0.0</text>
+<text x="1122" y="197" font-family="Arial" font-size="12" font-weight="400" fill="#616161">1.0</text>
+<text x="720" y="287" font-family="Arial" font-size="14" font-weight="600" fill="#e45756">random draw = 0.21</text>
+<text x="940" y="287" font-family="Arial" font-size="14" font-weight="600" fill="#2f5d8c">p_kill = 0.286</text>
+<text x="720" y="330" font-family="Arial" font-size="18" font-weight="700" fill="#2e7d32">SUCCESS (one prey removed)</text>
+<text x="720" y="360" font-family="Arial" font-size="15" font-weight="400" fill="#222222">Reward share per predator: 1.333</text>
+<line x1="110" y1="710" x2="560" y2="710" stroke="#666666" stroke-width="1.5" />
+<line x1="110" y1="500" x2="110" y2="710" stroke="#666666" stroke-width="1.5" />
+<line x1="104" y1="710.0" x2="560" y2="710.0" stroke="#e5e5e5" stroke-width="1.0" />
+<text x="80" y="714.0" font-family="Arial" font-size="11" font-weight="400" fill="#555555">0</text>
+<line x1="104" y1="660.0" x2="560" y2="660.0" stroke="#e5e5e5" stroke-width="1.0" />
+<text x="80" y="664.0" font-family="Arial" font-size="11" font-weight="400" fill="#555555">1</text>
+<line x1="104" y1="610.0" x2="560" y2="610.0" stroke="#e5e5e5" stroke-width="1.0" />
+<text x="80" y="614.0" font-family="Arial" font-size="11" font-weight="400" fill="#555555">2</text>
+<line x1="104" y1="560.0" x2="560" y2="560.0" stroke="#e5e5e5" stroke-width="1.0" />
+<text x="80" y="564.0" font-family="Arial" font-size="11" font-weight="400" fill="#555555">3</text>
+<line x1="104" y1="510.0" x2="560" y2="510.0" stroke="#e5e5e5" stroke-width="1.0" />
+<text x="80" y="514.0" font-family="Arial" font-size="11" font-weight="400" fill="#555555">4</text>
+<rect x="141.0" y="620.0" width="38" height="90.0" fill="#72b7b2" stroke="none" stroke-width="0.0" rx="0" />
+<rect x="191.0" y="558.7333333333333" width="38" height="151.26666666666665" fill="#54a24b" stroke="none" stroke-width="0.0" rx="0" />
+<text x="133.0" y="734" font-family="Arial" font-size="11" font-weight="400" fill="#3f6f6a">Initial</text>
+<text x="187.0" y="734" font-family="Arial" font-size="11" font-weight="400" fill="#2e6a2c">Final</text>
+<text x="172.0" y="754" font-family="Arial" font-size="13" font-weight="700" fill="#222222">A</text>
+<text x="139.0" y="548.7333333333333" font-family="Arial" font-size="11" font-weight="400" fill="#333333">+1.333  -0.108</text>
+<rect x="291.0" y="590.0" width="38" height="120.0" fill="#72b7b2" stroke="none" stroke-width="0.0" rx="0" />
+<rect x="341.0" y="532.7333333333333" width="38" height="177.26666666666665" fill="#54a24b" stroke="none" stroke-width="0.0" rx="0" />
+<text x="283.0" y="734" font-family="Arial" font-size="11" font-weight="400" fill="#3f6f6a">Initial</text>
+<text x="337.0" y="734" font-family="Arial" font-size="11" font-weight="400" fill="#2e6a2c">Final</text>
+<text x="322.0" y="754" font-family="Arial" font-size="13" font-weight="700" fill="#222222">B</text>
+<text x="289.0" y="522.7333333333333" font-family="Arial" font-size="11" font-weight="400" fill="#333333">+1.333  -0.188</text>
+<rect x="441.0" y="655.0" width="38" height="55.0" fill="#72b7b2" stroke="none" stroke-width="0.0" rx="0" />
+<rect x="491.0" y="600.7333333333333" width="38" height="109.26666666666667" fill="#54a24b" stroke="none" stroke-width="0.0" rx="0" />
+<text x="433.0" y="734" font-family="Arial" font-size="11" font-weight="400" fill="#3f6f6a">Initial</text>
+<text x="487.0" y="734" font-family="Arial" font-size="11" font-weight="400" fill="#2e6a2c">Final</text>
+<text x="472.0" y="754" font-family="Arial" font-size="13" font-weight="700" fill="#222222">C</text>
+<text x="439.0" y="590.7333333333333" font-family="Arial" font-size="11" font-weight="400" fill="#333333">+1.333  -0.248</text>
+<text x="60" y="720" font-family="Courier New" font-size="13" font-weight="400" fill="#222222">Per-tick cost = METAB + MOVE + COOP_COST * coop</text>
+<line x1="720" y1="710" x2="1170" y2="710" stroke="#666666" stroke-width="1.5" />
+<line x1="720" y1="500" x2="720" y2="710" stroke="#666666" stroke-width="1.5" />
+<line x1="720" y1="560.0" x2="1170" y2="560.0" stroke="#424242" stroke-width="2.0" stroke-dasharray="7,6" />
+<text x="728" y="552.0" font-family="Arial" font-size="12" font-weight="400" fill="#424242">birth threshold = 3.0</text>
+<rect x="767.0" y="558.7333333333333" width="56" height="151.26666666666665" fill="#2e7d32" stroke="none" stroke-width="0.0" rx="0" />
+<text x="789.0" y="734" font-family="Arial" font-size="14" font-weight="700" fill="#222222">A</text>
+<text x="765.0" y="550.7333333333333" font-family="Arial" font-size="12" font-weight="400" fill="#222222">3.025</text>
+<text x="759.0" y="532.7333333333333" font-family="Arial" font-size="12" font-weight="700" fill="#2e7d32">reproduce</text>
+<rect x="917.0" y="532.7333333333333" width="56" height="177.26666666666665" fill="#2e7d32" stroke="none" stroke-width="0.0" rx="0" />
+<text x="939.0" y="734" font-family="Arial" font-size="14" font-weight="700" fill="#222222">B</text>
+<text x="915.0" y="524.7333333333333" font-family="Arial" font-size="12" font-weight="400" fill="#222222">3.545</text>
+<text x="909.0" y="506.73333333333335" font-family="Arial" font-size="12" font-weight="700" fill="#2e7d32">reproduce</text>
+<rect x="1067.0" y="600.7333333333333" width="56" height="109.26666666666667" fill="#ef6c00" stroke="none" stroke-width="0.0" rx="0" />
+<text x="1089.0" y="734" font-family="Arial" font-size="14" font-weight="700" fill="#222222">C</text>
+<text x="1065.0" y="592.7333333333333" font-family="Arial" font-size="12" font-weight="400" fill="#222222">2.185</text>
+<text x="1059.0" y="574.7333333333333" font-family="Arial" font-size="12" font-weight="700" fill="#ef6c00">no birth</text>
+</svg>

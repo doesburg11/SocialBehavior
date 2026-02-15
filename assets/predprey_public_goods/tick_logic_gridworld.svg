@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="860" viewBox="0 0 1320 860">
+<rect x="0" y="0" width="1320" height="860" fill="#f7f8fb" stroke="none" stroke-width="0.0" rx="0" />
+<text text-anchor="middle" x="660.0" y="44" font-family="Arial" font-size="30" font-weight="700" fill="#101820">One Tick Gridworld: Before and After Hunt</text>
+<rect x="40" y="80" width="600" height="660" fill="#ffffff" stroke="#d6d6d6" stroke-width="1.5" rx="8" />
+<text x="54" y="108" font-family="Arial" font-size="18" font-weight="700" fill="#1f1f1f">A) Before Hunt</text>
+<rect x="680" y="80" width="600" height="660" fill="#ffffff" stroke="#d6d6d6" stroke-width="1.5" rx="8" />
+<text x="694" y="108" font-family="Arial" font-size="18" font-weight="700" fill="#1f1f1f">B) After Hunt</text>
+<rect x="84" y="148" width="468" height="468" fill="#ffffff" stroke="#b5bdc8" stroke-width="1.5" rx="0" />
+<rect x="240" y="304" width="156" height="156" fill="#e3f2fd" stroke="#1f77b4" stroke-width="2.0" rx="0" />
+<line x1="84" y1="148" x2="84" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="84" y1="148" x2="552" y2="148" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="136" y1="148" x2="136" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="84" y1="200" x2="552" y2="200" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="188" y1="148" x2="188" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="84" y1="252" x2="552" y2="252" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="240" y1="148" x2="240" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="84" y1="304" x2="552" y2="304" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="292" y1="148" x2="292" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="84" y1="356" x2="552" y2="356" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="344" y1="148" x2="344" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="84" y1="408" x2="552" y2="408" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="396" y1="148" x2="396" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="84" y1="460" x2="552" y2="460" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="448" y1="148" x2="448" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="84" y1="512" x2="552" y2="512" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="500" y1="148" x2="500" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="84" y1="564" x2="552" y2="564" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="552" y1="148" x2="552" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="84" y1="616" x2="552" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<text x="104" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">0</text>
+<text x="66" y="179" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">0</text>
+<text x="156" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">1</text>
+<text x="66" y="231" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">1</text>
+<text x="208" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">2</text>
+<text x="66" y="283" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">2</text>
+<text x="260" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">3</text>
+<text x="66" y="335" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">3</text>
+<text x="312" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">4</text>
+<text x="66" y="387" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">4</text>
+<text x="364" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">5</text>
+<text x="66" y="439" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">5</text>
+<text x="416" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">6</text>
+<text x="66" y="491" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">6</text>
+<text x="468" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">7</text>
+<text x="66" y="543" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">7</text>
+<text x="520" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">8</text>
+<text x="66" y="595" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">8</text>
+<text x="96" y="642" font-family="Arial" font-size="12" font-weight="600" fill="#444444">x</text>
+<text x="56" y="162" font-family="Arial" font-size="12" font-weight="600" fill="#444444">y</text>
+<circle cx="162.0" cy="226.0" r="8" fill="#c6c9cf" stroke="#888c94" stroke-width="1.2" />
+<text x="172.0" y="230.0" font-family="Arial" font-size="10" font-weight="400" fill="#6f747d">Q1</text>
+<circle cx="474.0" cy="278.0" r="8" fill="#c6c9cf" stroke="#888c94" stroke-width="1.2" />
+<text x="484.0" y="282.0" font-family="Arial" font-size="10" font-weight="400" fill="#6f747d">Q2</text>
+<circle cx="474.0" cy="538.0" r="8" fill="#c6c9cf" stroke="#888c94" stroke-width="1.2" />
+<text x="484.0" y="542.0" font-family="Arial" font-size="10" font-weight="400" fill="#6f747d">Q3</text>
+<circle cx="266.0" cy="382.0" r="8.5" fill="#f28e2b" stroke="#8c4a00" stroke-width="2.2" />
+<text x="277.0" y="386.0" font-family="Arial" font-size="10" font-weight="400" fill="#6d3d02">P1</text>
+<circle cx="370.0" cy="382.0" r="8.5" fill="#f28e2b" stroke="#935b17" stroke-width="1.4" />
+<text x="381.0" y="386.0" font-family="Arial" font-size="10" font-weight="400" fill="#6d3d02">P2</text>
+<circle cx="318.0" cy="330.0" r="8.5" fill="#f28e2b" stroke="#935b17" stroke-width="1.4" />
+<text x="329.0" y="334.0" font-family="Arial" font-size="10" font-weight="400" fill="#6d3d02">P3</text>
+<circle cx="370.0" cy="434.0" r="8.5" fill="#f28e2b" stroke="#935b17" stroke-width="1.4" />
+<text x="381.0" y="438.0" font-family="Arial" font-size="10" font-weight="400" fill="#6d3d02">P4</text>
+<circle cx="318.0" cy="434.0" r="8.5" fill="#f28e2b" stroke="#935b17" stroke-width="1.4" />
+<text x="329.0" y="438.0" font-family="Arial" font-size="10" font-weight="400" fill="#6d3d02">P5</text>
+<circle cx="306.0" cy="372.0" r="10.5" fill="#ffffff" stroke="#4E79A7" stroke-width="2.2" />
+<text x="302.0" y="376.0" font-family="Arial" font-size="10" font-weight="700" fill="#4E79A7">A</text>
+<circle cx="330.0" cy="372.0" r="10.5" fill="#ffffff" stroke="#59A14F" stroke-width="2.2" />
+<text x="326.0" y="376.0" font-family="Arial" font-size="10" font-weight="700" fill="#59A14F">B</text>
+<circle cx="318.0" cy="394.0" r="10.5" fill="#ffffff" stroke="#E15759" stroke-width="2.2" />
+<text x="314.0" y="398.0" font-family="Arial" font-size="10" font-weight="700" fill="#E15759">C</text>
+<text x="84" y="640" font-family="Arial" font-size="12" font-weight="700" fill="#222222">Legend:</text>
+<circle cx="144" cy="637" r="6" fill="#f28e2b" stroke="#935b17" stroke-width="1.2" />
+<text x="156" y="641" font-family="Arial" font-size="11" font-weight="400" fill="#222222">candidate prey</text>
+<circle cx="304" cy="637" r="6" fill="#c6c9cf" stroke="#888c94" stroke-width="1.2" />
+<text x="316" y="641" font-family="Arial" font-size="11" font-weight="400" fill="#222222">outside prey</text>
+<circle cx="444" cy="637" r="6" fill="#ffffff" stroke="#4E79A7" stroke-width="1.8" />
+<text x="456" y="641" font-family="Arial" font-size="11" font-weight="400" fill="#222222">predator</text>
+<text x="84" y="694" font-family="Arial" font-size="12" font-weight="400" fill="#1f4e79">Highlighted blue box: HUNT_R = 1 neighborhood</text>
+<text x="84" y="716" font-family="Arial" font-size="12" font-weight="400" fill="#1f1f1f">Predators A,B,C share one cell and one hunt attempt</text>
+<rect x="724" y="148" width="468" height="468" fill="#ffffff" stroke="#b5bdc8" stroke-width="1.5" rx="0" />
+<rect x="880" y="304" width="156" height="156" fill="#e3f2fd" stroke="#1f77b4" stroke-width="2.0" rx="0" />
+<line x1="724" y1="148" x2="724" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="724" y1="148" x2="1192" y2="148" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="776" y1="148" x2="776" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="724" y1="200" x2="1192" y2="200" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="828" y1="148" x2="828" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="724" y1="252" x2="1192" y2="252" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="880" y1="148" x2="880" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="724" y1="304" x2="1192" y2="304" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="932" y1="148" x2="932" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="724" y1="356" x2="1192" y2="356" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="984" y1="148" x2="984" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="724" y1="408" x2="1192" y2="408" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="1036" y1="148" x2="1036" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="724" y1="460" x2="1192" y2="460" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="1088" y1="148" x2="1088" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="724" y1="512" x2="1192" y2="512" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="1140" y1="148" x2="1140" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="724" y1="564" x2="1192" y2="564" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="1192" y1="148" x2="1192" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<line x1="724" y1="616" x2="1192" y2="616" stroke="#d8dce3" stroke-width="1.0" />
+<text x="744" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">0</text>
+<text x="706" y="179" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">0</text>
+<text x="796" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">1</text>
+<text x="706" y="231" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">1</text>
+<text x="848" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">2</text>
+<text x="706" y="283" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">2</text>
+<text x="900" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">3</text>
+<text x="706" y="335" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">3</text>
+<text x="952" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">4</text>
+<text x="706" y="387" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">4</text>
+<text x="1004" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">5</text>
+<text x="706" y="439" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">5</text>
+<text x="1056" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">6</text>
+<text x="706" y="491" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">6</text>
+<text x="1108" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">7</text>
+<text x="706" y="543" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">7</text>
+<text x="1160" y="138" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">8</text>
+<text x="706" y="595" font-family="Arial" font-size="11" font-weight="400" fill="#70757d">8</text>
+<text x="736" y="642" font-family="Arial" font-size="12" font-weight="600" fill="#444444">x</text>
+<text x="696" y="162" font-family="Arial" font-size="12" font-weight="600" fill="#444444">y</text>
+<circle cx="802.0" cy="226.0" r="8" fill="#c6c9cf" stroke="#888c94" stroke-width="1.2" />
+<text x="812.0" y="230.0" font-family="Arial" font-size="10" font-weight="400" fill="#6f747d">Q1</text>
+<circle cx="1114.0" cy="278.0" r="8" fill="#c6c9cf" stroke="#888c94" stroke-width="1.2" />
+<text x="1124.0" y="282.0" font-family="Arial" font-size="10" font-weight="400" fill="#6f747d">Q2</text>
+<circle cx="1114.0" cy="538.0" r="8" fill="#c6c9cf" stroke="#888c94" stroke-width="1.2" />
+<text x="1124.0" y="542.0" font-family="Arial" font-size="10" font-weight="400" fill="#6f747d">Q3</text>
+<circle cx="1010.0" cy="382.0" r="8.5" fill="#f28e2b" stroke="#935b17" stroke-width="1.4" />
+<text x="1021.0" y="386.0" font-family="Arial" font-size="10" font-weight="400" fill="#6d3d02">P2</text>
+<circle cx="958.0" cy="330.0" r="8.5" fill="#f28e2b" stroke="#935b17" stroke-width="1.4" />
+<text x="969.0" y="334.0" font-family="Arial" font-size="10" font-weight="400" fill="#6d3d02">P3</text>
+<circle cx="1010.0" cy="434.0" r="8.5" fill="#f28e2b" stroke="#935b17" stroke-width="1.4" />
+<text x="1021.0" y="438.0" font-family="Arial" font-size="10" font-weight="400" fill="#6d3d02">P4</text>
+<circle cx="958.0" cy="434.0" r="8.5" fill="#f28e2b" stroke="#935b17" stroke-width="1.4" />
+<text x="969.0" y="438.0" font-family="Arial" font-size="10" font-weight="400" fill="#6d3d02">P5</text>
+<circle cx="946.0" cy="372.0" r="10.5" fill="#ffffff" stroke="#4E79A7" stroke-width="2.2" />
+<text x="942.0" y="376.0" font-family="Arial" font-size="10" font-weight="700" fill="#4E79A7">A</text>
+<circle cx="970.0" cy="372.0" r="10.5" fill="#ffffff" stroke="#59A14F" stroke-width="2.2" />
+<text x="966.0" y="376.0" font-family="Arial" font-size="10" font-weight="700" fill="#59A14F">B</text>
+<circle cx="958.0" cy="394.0" r="10.5" fill="#ffffff" stroke="#E15759" stroke-width="2.2" />
+<text x="954.0" y="398.0" font-family="Arial" font-size="10" font-weight="700" fill="#E15759">C</text>
+<line x1="897.0" y1="373.0" x2="915.0" y2="391.0" stroke="#b00020" stroke-width="2.2" />
+<line x1="897.0" y1="391.0" x2="915.0" y2="373.0" stroke="#b00020" stroke-width="2.2" />
+<text text-anchor="end" x="892.0" y="372.0" font-family="Arial" font-size="11" font-weight="700" fill="#b00020">P1 removed</text>
+<text x="724" y="640" font-family="Arial" font-size="12" font-weight="700" fill="#222222">Legend:</text>
+<circle cx="784" cy="637" r="6" fill="#f28e2b" stroke="#935b17" stroke-width="1.2" />
+<text x="796" y="641" font-family="Arial" font-size="11" font-weight="400" fill="#222222">candidate prey</text>
+<circle cx="944" cy="637" r="6" fill="#c6c9cf" stroke="#888c94" stroke-width="1.2" />
+<text x="956" y="641" font-family="Arial" font-size="11" font-weight="400" fill="#222222">outside prey</text>
+<circle cx="1084" cy="637" r="6" fill="#ffffff" stroke="#4E79A7" stroke-width="1.8" />
+<text x="1096" y="641" font-family="Arial" font-size="11" font-weight="400" fill="#222222">predator</text>
+<text x="724" y="694" font-family="Arial" font-size="12" font-weight="400" fill="#1f4e79">Highlighted blue box: HUNT_R = 1 neighborhood</text>
+<text x="724" y="716" font-family="Arial" font-size="12" font-weight="400" fill="#1f1f1f">Predators A,B,C share one cell and one hunt attempt</text>
+<text x="70" y="790" font-family="Courier New" font-size="15" font-weight="700" fill="#213547">S=sum(coop)=1.7, p_kill = 1 - (1 - 0.18)^S = 0.286, draw=0.21 -&gt; kill</text>
+<text x="70" y="816" font-family="Arial" font-size="14" font-weight="400" fill="#213547">Kill reward shared equally: 4.0 / 3 = 1.333 energy per predator</text>
+</svg>
