@@ -29,6 +29,8 @@ and provides a theoretical interpretation using:
 14. Next Directions
 15. Mathematical Derivation (Current Reward Rule)
 16. Simulation Logic (Code-Level)
+17. One-Tick Worked Example (Visual)
+18. Comparison vs MARL Stag-Hunt (Updated)
 
 ------------------------------------------------------------------------
 
@@ -296,8 +298,8 @@ Animation layers:
 From repo root:
 
 ```bash
-python predprey_public_goods/emerging_cooperation.py
-python predprey_public_goods/sweep_p0_prey_repro.py
+./.conda/bin/python predprey_public_goods/emerging_cooperation.py
+./.conda/bin/python predprey_public_goods/sweep_p0_prey_repro.py
 ```
 
 Notes:
@@ -314,13 +316,19 @@ Notes:
 Defaults in `predprey_public_goods/emerging_cooperation.py`:
 
 - Grid: `W=60`, `H=60`
-- Initial populations: `PRED_INIT=250`, `PREY_INIT=600`
+- Initial populations: `PRED_INIT=100`, `PREY_INIT=1400`
+- Predator initial energy: `PRED_ENERGY_INIT=1.7`
 - Steps: `STEPS=2500`
-- Predator costs: `METAB_PRED=0.06`, `MOVE_COST=0.008`, `COOP_COST=0.20`
-- Predator reproduction: `BIRTH_THRESH_PRED=3.0`, `LOCAL_BIRTH_R=1`
+- Predator costs: `METAB_PRED=0.052`, `MOVE_COST=0.008`, `COOP_COST=0.09`
+- Predator reproduction: `BIRTH_THRESH_PRED=4.2`, `PRED_REPRO_PROB=0.10`,
+  `PRED_MAX=800`, `LOCAL_BIRTH_R=1`
 - Mutation: `MUT_RATE=0.03`, `MUT_SIGMA=0.08`
-- Hunt: `HUNT_R=1`, `P0=0.18`, `KILL_ENERGY=4.0`
-- Prey: `PREY_MOVE_PROB=0.25`, `PREY_REPRO_PROB=0.04`, `PREY_MAX=1600`
+- Hunt: `HUNT_RULE="energy_threshold_gate"`, `HUNT_R=1`,
+  `HUNTER_POOL_R=1`, `P0=0.24`, `KILL_ENERGY=3.8`, `COOP_POWER_FLOOR=0.35`
+- Prey: `PREY_MOVE_PROB=0.25`, `PREY_REPRO_PROB=0.058`, `PREY_MAX=3200`,
+  `PREY_METAB=0.05`, `PREY_MOVE_COST=0.01`, `PREY_BIRTH_THRESH=2.0`,
+  `PREY_BIRTH_SPLIT=0.36`, `PREY_BITE_SIZE=0.24`
+- Grass: `GRASS_INIT=0.8`, `GRASS_MAX=3.0`, `GRASS_REGROWTH=0.055`
 - Clustering radius: `CLUST_R=2`
 
 Defaults in `predprey_public_goods/sweep_p0_prey_repro.py`:
@@ -345,37 +353,38 @@ Defaults in `predprey_public_goods/sweep_p0_prey_repro.py`:
 
 # 15. Mathematical Derivation (Current Reward Rule)
 
-Let `c_i in [0,1]` be individual cooperation in local hunting group `g`,
-with:
+This section summarizes the implemented hard-gate reward logic.
 
-`S_g = sum_{j in g} c_j`
+For a local hunter set `g` around a candidate prey:
 
-Kill probability:
+- Trait sum: `S_g = sum_{j in g} c_j`
+- Cooperative power:
+  `P_g = sum_{j in g} e_j * [alpha + (1 - alpha) c_j]`,
+  with `alpha = COOP_POWER_FLOOR`
+- Prey energy threshold: `E_prey`
+
+Gate 1 (hard constraint):
+
+`P_g >= E_prey`
+
+Gate 2 (probabilistic success in `energy_threshold_gate` mode):
 
 `p_kill(S_g) = 1 - (1 - p0)^(S_g)`
 
-Current reward rule (equal sharing among local hunters):
+If both gates pass, kill energy is shared equally:
 
-`G_i = p_kill(S_g) * E / n_g`
+`G_i = KILL_ENERGY / n_g`
 
-Cost per tick:
+Per-tick predator cost:
 
-`C_i = kappa c_i`
+`C_i = METAB_PRED + MOVE_COST + COOP_COST * c_i`
 
-Fitness proxy:
+A local fitness proxy under gate mode is therefore:
 
-`W_i = (E / n_g) * [1 - (1 - p0)^(S_g)] - kappa c_i`
+`W_i ~ I(P_g >= E_prey) * p_kill(S_g) * (KILL_ENERGY / n_g) - C_i`
 
-Selection gradient:
-
-`dW_i/dc_i = (E / n_g) * (1 - p0)^(S_g) * ln(1 / (1 - p0)) - kappa`
-
-Condition for local selection favoring more cooperation:
-
-`(E / n_g) * (1 - p0)^(S_g) * ln(1 / (1 - p0)) > kappa`
-
-Because the benefit term decreases with `S_g` (saturation) while cost remains
-linear, interior cooperation regimes are expected in broad parameter regions.
+Because benefits are both thresholded and saturating while costs are linear in
+`c_i`, interior cooperation regimes remain expected.
 
 ------------------------------------------------------------------------
 
@@ -387,37 +396,45 @@ This section documents the exact update order used in
 ## State Variables
 
 - Predator agent: `(x, y, energy, coop)` where `coop in [0,1]`.
-- Prey agent: `(x, y)`.
+- Prey agent: `(x, y, energy)`.
+- Grass field: per-cell energy `grass[y, x]`.
 - Space is a wrapped torus (`wrap`), so movement beyond an edge re-enters on
   the opposite side.
 
 ## Per-Tick Update Order
 
-1. Prey movement and prey reproduction.
-2. Build spatial indexes for prey and predators.
-3. Predator hunting and energy gain.
-4. Remove killed prey.
-5. Predator costs, movement, reproduction, mutation, death.
+1. Grass regrowth (`GRASS_REGROWTH`, capped by `GRASS_MAX`).
+2. Prey movement, energy costs, grass consumption, prey reproduction.
+3. Build spatial indexes for prey and predators.
+4. Predator hunting and energy gain.
+5. Remove killed prey.
+6. Predator costs, movement, reproduction, mutation, death.
 
 ## Prey Dynamics
 
 - Each prey moves with probability `PREY_MOVE_PROB` by a local step in
   `{ -1, 0, 1 }` for x and y.
+- Each prey pays `PREY_METAB` and (if moved) `PREY_MOVE_COST`.
+- Each prey consumes grass at its cell up to `PREY_BITE_SIZE`.
+- Prey with `energy <= 0` are removed.
 - Reproduction is density-limited by:
   `repro_scale = max(0, 1 - prey_count / PREY_MAX)`.
-- Birth probability per prey per tick is:
+- Birth is energy-gated (`energy >= PREY_BIRTH_THRESH`) and stochastic:
   `PREY_REPRO_PROB * repro_scale`.
-- New prey spawn in a local neighborhood around the parent.
+- On birth, child gets `PREY_BIRTH_SPLIT * parent_energy` and the parent loses
+  that energy.
 
 ## Hunting Logic
 
 - Predators are grouped by current cell.
 - For each predator-occupied cell `(cx, cy)`, candidate prey are collected from
   all cells in a square neighborhood radius `HUNT_R` (Chebyshev radius).
-- Let `S = sum(coop_i)` over predators in that cell. Kill probability is:
-  `p_kill = 1 - (1 - P0)^S`.
+- Hunters are pooled around each victim using `HUNTER_POOL_R`.
+- Hard gate: cooperative weighted power must exceed prey energy.
+- In `energy_threshold_gate` mode, an additional probabilistic gate is applied:
+  `p_kill = 1 - (1 - P0)^S` with `S = sum(coop_i)`.
 - If a kill occurs, one prey candidate is removed.
-- Kill reward is shared equally among hunters in that cell:
+- Kill reward is shared equally among hunters:
   `share = KILL_ENERGY / n_hunters`.
 
 ## Predator Energy, Reproduction, Mutation
@@ -425,8 +442,13 @@ This section documents the exact update order used in
 - Each predator pays per tick:
   `METAB_PRED + MOVE_COST + COOP_COST * coop`.
 - Predators then move by a local wrapped step.
-- If `energy >= BIRTH_THRESH_PRED`, predator reproduces:
-  energy is halved; child inherits parent trait and local position.
+- Reproduction is thresholded and probabilistic:
+  `energy >= BIRTH_THRESH_PRED` and
+  `random < PRED_REPRO_PROB * pred_repro_scale`.
+- `pred_repro_scale` includes predator crowding (`PRED_MAX`) and prey
+  availability (`len(preys) / PREY_INIT`).
+- On reproduction, parent energy is halved; child inherits parent trait and
+  local position.
 - Child mutates with probability `MUT_RATE`:
   `coop_child = clamp01(coop_parent + Normal(0, MUT_SIGMA))`.
 - Predators with `energy <= 0` are removed.
@@ -436,6 +458,7 @@ This section documents the exact update order used in
 - A run stops early if either predators or prey go extinct (`pred_n == 0` or
   `prey_n == 0`); this is an extinction run.
 - A run is marked successful only if no extinction occurs before `STEPS`.
+- With `RESTART_ON_EXTINCTION=True`, `main()` retries up to `MAX_RESTARTS`.
 - Recorded outputs include:
   predator count history, prey count history, mean/variance cooperation history,
   optional animation snapshots, final predator list, `success` flag, and
@@ -466,5 +489,31 @@ This version shows the same numerical example in a concrete local grid:
 To regenerate:
 
 ```bash
-python predprey_public_goods/visualize_tick_logic.py
+./.conda/bin/python predprey_public_goods/visualize_tick_logic.py
 ```
+
+------------------------------------------------------------------------
+
+# 18. Comparison vs MARL Stag-Hunt (Updated)
+
+This project intentionally keeps one core difference from
+`predpreygrass/rllib/stag_hunt_forward_view`:
+
+- Nature-focused cooperation here: cooperation is a heritable trait (`coop`).
+- Nurture-focused cooperation there: cooperation is an action decision
+  (`join_hunt`) each step.
+
+What is now aligned more closely with the MARL ecology:
+
+- Prey have explicit energy household and can starve.
+- Grass is explicit, regrows each tick, and is consumed by prey.
+- Predator reproduction is energy-driven with additional regulation.
+- Cooperative hunt uses local pooling plus energy-threshold gating.
+
+What still differs (beyond the intended trait-vs-action distinction):
+
+- No explicit `join_cost` / scavenger free-rider payoff split.
+- No RL action/observation API or per-agent termination/truncation outputs.
+- No bounded-grid wall/LOS movement constraints.
+- Single-species predator + scalar trait evolution, rather than typed MARL agent
+  populations.

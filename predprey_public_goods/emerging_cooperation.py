@@ -44,16 +44,19 @@ from matplotlib.colors import LogNorm
 
 W, H = 60, 60
 
-PRED_INIT = 250
-PREY_INIT = 600
+PRED_INIT = 100
+PREY_INIT = 1400
+PRED_ENERGY_INIT = 1.7
 
 STEPS = 2500
 
 # --- Predator energetics ---
-METAB_PRED = 0.06
+METAB_PRED = 0.052
 MOVE_COST = 0.008
-COOP_COST = 0.20          # cost per tick * coop_level
-BIRTH_THRESH_PRED = 3.0
+COOP_COST = 0.4          # cost per tick * coop_level (tuned for hard-gate long runs)
+BIRTH_THRESH_PRED = 4.2
+PRED_REPRO_PROB = 0.10
+PRED_MAX = 800
 MUT_RATE = 0.03
 MUT_SIGMA = 0.08
 LOCAL_BIRTH_R = 1
@@ -61,18 +64,30 @@ LOCAL_BIRTH_R = 1
 # --- Hunt mechanics ---
 HUNT_R = 1
 HUNT_RULE = "energy_threshold_gate"  # "energy_threshold_gate", "energy_threshold", or "probabilistic"
-P0 = 0.18                        # used when HUNT_RULE == "probabilistic"
-KILL_ENERGY = 4.0
-HUNTER_POOL_R = 1                # used when HUNT_RULE starts with "energy_threshold"
-COOP_POWER_FLOOR = 0.20          # non-zero baseline contribution to hunt power
+P0 = 0.2                            # used when probabilistic gate is active
+KILL_ENERGY = 3.8
+HUNTER_POOL_R = 1                    # used when HUNT_RULE starts with "energy_threshold"
+COOP_POWER_FLOOR = 0.35              # non-zero baseline contribution to hunt power
+ALLOW_FREE_RIDING = True             # True: equal split, False: contribution-weighted split
+LOG_REWARD_SPLIT = True              # print run-level reward split inequality summary
 
 # --- Prey dynamics ---
 PREY_MOVE_PROB = 0.25
-PREY_REPRO_PROB = 0.04
-PREY_MAX = 1600
+PREY_REPRO_PROB = 0.058
+PREY_MAX = 3200
 PREY_ENERGY_MEAN = 1.1
 PREY_ENERGY_SIGMA = 0.25
 PREY_ENERGY_MIN = 0.10
+PREY_METAB = 0.05
+PREY_MOVE_COST = 0.01
+PREY_BIRTH_THRESH = 2.0
+PREY_BIRTH_SPLIT = 0.36
+PREY_BITE_SIZE = 0.24
+
+# --- Grass dynamics ---
+GRASS_INIT = 0.8
+GRASS_MAX = 3.0
+GRASS_REGROWTH = 0.055
 
 # --- Visualization ---
 ANIMATE = True
@@ -91,7 +106,7 @@ CLUSTER_ALPHA = 1.0         # base clustering heatmap alpha
 
 SEED = None                 # set to int for reproducibility (e.g. 42)
 RESTART_ON_EXTINCTION = True
-MAX_RESTARTS = 30           # max additional attempts if extinction occurs early
+MAX_RESTARTS = 60           # max additional attempts if extinction occurs early
 
 
 # ============================================================
@@ -126,14 +141,24 @@ def sample_prey_energy() -> float:
     return max(PREY_ENERGY_MIN, e)
 
 
+def init_grass_field() -> np.ndarray:
+    """Initialize per-cell grass energy."""
+    return np.full((H, W), GRASS_INIT, dtype=float)
+
+
 # ============================================================
 # CORE ECOLOGY
 # ============================================================
 
-def step_world(preds: List[Predator], preys: List[Prey]) -> Tuple[List[Predator], List[Prey]]:
-    """One tick update: prey update, predator hunting, predator costs/move/repro/death."""
+def step_world(
+    preds: List[Predator], preys: List[Prey], grass: np.ndarray, split_stats: dict | None = None
+) -> Tuple[List[Predator], List[Prey], np.ndarray]:
+    """One tick update: grass regrowth, prey energy budget, predator hunt/cost/repro/death."""
 
-    # ---- Prey move + reproduce
+    # ---- Grass regrowth
+    np.minimum(grass + GRASS_REGROWTH, GRASS_MAX, out=grass)
+
+    # ---- Prey move + energy household + reproduce
     new_preys: List[Prey] = []
     prey_count = len(preys)
 
@@ -141,17 +166,34 @@ def step_world(preds: List[Predator], preys: List[Prey]) -> Tuple[List[Predator]
     repro_scale = max(0.0, 1.0 - crowd)
 
     for pr in preys:
+        moved = False
         if random.random() < PREY_MOVE_PROB:
             pr.x = wrap(pr.x + random.choice([-1, 0, 1]), W)
             pr.y = wrap(pr.y + random.choice([-1, 0, 1]), H)
+            moved = True
 
-        new_preys.append(pr)
+        pr.energy -= PREY_METAB
+        if moved:
+            pr.energy -= PREY_MOVE_COST
+        if pr.energy <= 0.0:
+            continue
 
-        if random.random() < PREY_REPRO_PROB * repro_scale:
+        bite = min(PREY_BITE_SIZE, float(grass[pr.y, pr.x]))
+        if bite > 0.0:
+            grass[pr.y, pr.x] -= bite
+            pr.energy += bite
+
+        if pr.energy <= 0.0:
+            continue
+
+        if pr.energy >= PREY_BIRTH_THRESH and random.random() < PREY_REPRO_PROB * repro_scale:
+            child_energy = pr.energy * PREY_BIRTH_SPLIT
+            pr.energy -= child_energy
             cx = wrap(pr.x + random.choice([-1, 0, 1]), W)
             cy = wrap(pr.y + random.choice([-1, 0, 1]), H)
-            new_preys.append(Prey(cx, cy, sample_prey_energy()))
+            new_preys.append(Prey(cx, cy, child_energy))
 
+        new_preys.append(pr)
     preys = new_preys
 
     # ---- Index prey by cell
@@ -235,9 +277,38 @@ def step_world(preds: List[Predator], preys: List[Prey]) -> Tuple[List[Predator]
 
         n_hunters = len(hunter_idxs)
         if n_hunters > 0:
-            share = KILL_ENERGY / n_hunters
-            for i in hunter_idxs:
-                preds[i].energy += share
+            shares: List[float]
+            if ALLOW_FREE_RIDING:
+                share = KILL_ENERGY / n_hunters
+                shares = [share] * n_hunters
+                for i in hunter_idxs:
+                    preds[i].energy += share
+            else:
+                contribs = [
+                    preds[i].energy * (COOP_POWER_FLOOR + (1.0 - COOP_POWER_FLOOR) * preds[i].coop)
+                    for i in hunter_idxs
+                ]
+                total_contrib = sum(contribs)
+                if total_contrib <= 1e-12:
+                    share = KILL_ENERGY / n_hunters
+                    shares = [share] * n_hunters
+                    for i in hunter_idxs:
+                        preds[i].energy += share
+                else:
+                    shares = []
+                    for i, ci in zip(hunter_idxs, contribs):
+                        gain = KILL_ENERGY * (ci / total_contrib)
+                        shares.append(gain)
+                        preds[i].energy += gain
+
+            if split_stats is not None:
+                split_stats["kills"] += 1
+                if n_hunters > 1:
+                    # 0.0 = perfectly equal split, larger = more unequal split.
+                    equal_share = KILL_ENERGY / n_hunters
+                    inequality = sum(abs(s - equal_share) for s in shares) / KILL_ENERGY
+                    split_stats["multi_hunter_kills"] += 1
+                    split_stats["inequality_sum"] += inequality
             predators_committed.update(hunter_idxs)
 
     if prey_killed_indices:
@@ -245,6 +316,9 @@ def step_world(preds: List[Predator], preys: List[Prey]) -> Tuple[List[Predator]
 
     # ---- Predator costs, movement, reproduction, death
     new_preds: List[Predator] = []
+    pred_crowd = len(preds) / max(1, PRED_MAX)
+    prey_availability = len(preys) / max(1, PREY_INIT)
+    pred_repro_scale = max(0.0, 1.0 - pred_crowd) * min(1.0, prey_availability)
 
     random.shuffle(preds)
     for pd in preds:
@@ -255,7 +329,10 @@ def step_world(preds: List[Predator], preys: List[Prey]) -> Tuple[List[Predator]
         pd.x = wrap(pd.x + random.choice([-1, 0, 1]), W)
         pd.y = wrap(pd.y + random.choice([-1, 0, 1]), H)
 
-        if pd.energy >= BIRTH_THRESH_PRED:
+        if (
+            pd.energy >= BIRTH_THRESH_PRED
+            and random.random() < PRED_REPRO_PROB * pred_repro_scale
+        ):
             pd.energy *= 0.5
             child = Predator(pd.x, pd.y, pd.energy, pd.coop)
 
@@ -270,7 +347,7 @@ def step_world(preds: List[Predator], preys: List[Prey]) -> Tuple[List[Predator]
         if pd.energy > 0.0:
             new_preds.append(pd)
 
-    return new_preds, preys
+    return new_preds, preys, grass
 
 
 # ============================================================
@@ -337,13 +414,14 @@ def run_sim(seed_override: int | None = None) -> Tuple[
         random.seed(SEED)
 
     preds: List[Predator] = [
-        Predator(random.randrange(W), random.randrange(H), 1.5, random.random())
+        Predator(random.randrange(W), random.randrange(H), PRED_ENERGY_INIT, random.random())
         for _ in range(PRED_INIT)
     ]
     preys: List[Prey] = [
         Prey(random.randrange(W), random.randrange(H), sample_prey_energy())
         for _ in range(PREY_INIT)
     ]
+    grass = init_grass_field()
 
     pred_hist: List[int] = []
     prey_hist: List[int] = []
@@ -352,11 +430,16 @@ def run_sim(seed_override: int | None = None) -> Tuple[
 
     preds_snaps: List[List[Predator]] = []
     preys_snaps: List[List[Prey]] = []
+    split_stats = {
+        "kills": 0,
+        "multi_hunter_kills": 0,
+        "inequality_sum": 0.0,
+    }
 
     extinction_step: int | None = None
 
     for t in range(STEPS):
-        preds, preys = step_world(preds, preys)
+        preds, preys, grass = step_world(preds, preys, grass, split_stats=split_stats)
 
         pred_n = len(preds)
         prey_n = len(preys)
@@ -387,6 +470,14 @@ def run_sim(seed_override: int | None = None) -> Tuple[
             break
 
     success = extinction_step is None
+    if LOG_REWARD_SPLIT:
+        multi = split_stats["multi_hunter_kills"]
+        mean_inequality = (split_stats["inequality_sum"] / multi) if multi > 0 else 0.0
+        split_mode = "equal" if ALLOW_FREE_RIDING else "contribution_weighted"
+        print(
+            f"Reward split [{split_mode}]: kills={split_stats['kills']} "
+            f"multi_hunter_kills={multi} mean_split_inequality={mean_inequality:.3f}"
+        )
     return (
         pred_hist,
         prey_hist,
