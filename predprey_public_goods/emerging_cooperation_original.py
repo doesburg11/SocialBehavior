@@ -60,19 +60,13 @@ LOCAL_BIRTH_R = 1
 
 # --- Hunt mechanics ---
 HUNT_R = 1
-HUNT_RULE = "energy_threshold_gate"  # "energy_threshold_gate", "energy_threshold", or "probabilistic"
-P0 = 0.18                        # used when HUNT_RULE == "probabilistic"
+P0 = 0.18
 KILL_ENERGY = 4.0
-HUNTER_POOL_R = 1                # used when HUNT_RULE starts with "energy_threshold"
-COOP_POWER_FLOOR = 0.20          # non-zero baseline contribution to hunt power
 
 # --- Prey dynamics ---
 PREY_MOVE_PROB = 0.25
 PREY_REPRO_PROB = 0.04
 PREY_MAX = 1600
-PREY_ENERGY_MEAN = 1.1
-PREY_ENERGY_SIGMA = 0.25
-PREY_ENERGY_MIN = 0.10
 
 # --- Visualization ---
 ANIMATE = True
@@ -110,7 +104,6 @@ class Predator:
 class Prey:
     x: int
     y: int
-    energy: float
 
 
 def wrap(v: int, L: int) -> int:
@@ -119,11 +112,6 @@ def wrap(v: int, L: int) -> int:
 
 def clamp01(v: float) -> float:
     return 0.0 if v < 0.0 else (1.0 if v > 1.0 else v)
-
-
-def sample_prey_energy() -> float:
-    e = PREY_ENERGY_MEAN + random.gauss(0.0, PREY_ENERGY_SIGMA)
-    return max(PREY_ENERGY_MIN, e)
 
 
 # ============================================================
@@ -150,7 +138,7 @@ def step_world(preds: List[Predator], preys: List[Prey]) -> Tuple[List[Predator]
         if random.random() < PREY_REPRO_PROB * repro_scale:
             cx = wrap(pr.x + random.choice([-1, 0, 1]), W)
             cy = wrap(pr.y + random.choice([-1, 0, 1]), H)
-            new_preys.append(Prey(cx, cy, sample_prey_energy()))
+            new_preys.append(Prey(cx, cy))
 
     preys = new_preys
 
@@ -166,7 +154,6 @@ def step_world(preds: List[Predator], preys: List[Prey]) -> Tuple[List[Predator]
 
     # ---- Hunting
     prey_killed_indices = set()
-    predators_committed = set()
 
     for (cx, cy), pred_idxs in pred_by_cell.items():
         candidates: List[int] = []
@@ -179,66 +166,25 @@ def step_world(preds: List[Predator], preys: List[Prey]) -> Tuple[List[Predator]
         if not candidates:
             continue
 
-        random.shuffle(candidates)
-        victim = None
-        for idx in candidates:
-            if idx not in prey_killed_indices:
-                victim = idx
-                break
-        if victim is None:
-            continue
+        sum_contrib = sum(preds[i].coop for i in pred_idxs)
+        pkill = 1.0 - (1.0 - P0) ** (sum_contrib + 1e-6)
 
-        hunter_idxs: List[int] = pred_idxs
-        kill_success = False
-
-        if HUNT_RULE == "probabilistic":
-            sum_contrib = sum(preds[i].coop for i in hunter_idxs)
-            pkill = 1.0 - (1.0 - P0) ** (sum_contrib + 1e-6)
-            kill_success = random.random() < pkill
-        elif HUNT_RULE in ("energy_threshold", "energy_threshold_gate"):
-            prey_energy = preys[victim].energy
-            vx = preys[victim].x
-            vy = preys[victim].y
-            hunter_idxs = []
-            for dy in range(-HUNTER_POOL_R, HUNTER_POOL_R + 1):
-                yy = (vy + dy) % H
-                for dx in range(-HUNTER_POOL_R, HUNTER_POOL_R + 1):
-                    xx = (vx + dx) % W
-                    hunter_idxs.extend(pred_by_cell.get((xx, yy), []))
-
-            if not hunter_idxs:
+        if random.random() < pkill:
+            victim = None
+            for idx in candidates:
+                if idx not in prey_killed_indices:
+                    victim = idx
+                    break
+            if victim is None:
                 continue
 
-            hunter_idxs = [i for i in hunter_idxs if i not in predators_committed]
-            if not hunter_idxs:
-                continue
+            prey_killed_indices.add(victim)
 
-            coop_weighted_power = sum(
-                preds[i].energy * (COOP_POWER_FLOOR + (1.0 - COOP_POWER_FLOOR) * preds[i].coop)
-                for i in hunter_idxs
-            )
-            if coop_weighted_power < prey_energy:
-                kill_success = False
-            elif HUNT_RULE == "energy_threshold":
-                kill_success = True
-            else:
-                sum_contrib = sum(preds[i].coop for i in hunter_idxs)
-                pkill = 1.0 - (1.0 - P0) ** (sum_contrib + 1e-6)
-                kill_success = random.random() < pkill
-        else:
-            raise ValueError(f"Unknown HUNT_RULE: {HUNT_RULE}")
-
-        if not kill_success:
-            continue
-
-        prey_killed_indices.add(victim)
-
-        n_hunters = len(hunter_idxs)
-        if n_hunters > 0:
-            share = KILL_ENERGY / n_hunters
-            for i in hunter_idxs:
-                preds[i].energy += share
-            predators_committed.update(hunter_idxs)
+            n_hunters = len(pred_idxs)
+            if n_hunters > 0:
+                share = KILL_ENERGY / n_hunters
+                for i in pred_idxs:
+                    preds[i].energy += share
 
     if prey_killed_indices:
         preys = [pr for i, pr in enumerate(preys) if i not in prey_killed_indices]
@@ -341,7 +287,7 @@ def run_sim(seed_override: int | None = None) -> Tuple[
         for _ in range(PRED_INIT)
     ]
     preys: List[Prey] = [
-        Prey(random.randrange(W), random.randrange(H), sample_prey_energy())
+        Prey(random.randrange(W), random.randrange(H))
         for _ in range(PREY_INIT)
     ]
 
@@ -376,7 +322,7 @@ def run_sim(seed_override: int | None = None) -> Tuple[
 
         if ANIMATE and t < ANIM_STEPS:
             preds_snaps.append([Predator(p.x, p.y, p.energy, p.coop) for p in preds])
-            preys_snaps.append([Prey(p.x, p.y, p.energy) for p in preys])
+            preys_snaps.append([Prey(p.x, p.y) for p in preys])
 
         if (t + 1) % 200 == 0:
             print(f"t={t+1:4d} preds={pred_n:4d} preys={prey_n:4d} mean_coop={mu:.3f} var={var:.3f}")
