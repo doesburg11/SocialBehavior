@@ -88,3 +88,35 @@ This is the direct comparison against `rllib/stag_hunt_forward_view` (not `ecolo
 - Movement constraints differ (bounded + walls/LOS vs wrapped random walk).
 
 So the systems are now ecologically closer, but parameter equivalence is still not one-to-one.
+
+## Minimal Alignment Plan (Step Order Only)
+
+Goal: make `emerging_cooperation.py` closer to `stag_hunt_forward_view` step flow while
+keeping the intended trait-based cooperation (`coop`) intact.
+
+1. Split `step_world()` into explicit sub-phases with local helpers:
+`_apply_decay_and_starvation`, `_regrow_grass`, `_move_agents`, `_resolve_engagements`,
+`_remove_dead`, `_reproduce`.
+2. Move predator decay earlier so both species pay per-step decay before engagements
+(closer to `predpreygrass_rllib_env.py:401`), while preserving existing `COOP_COST * coop`.
+3. Keep grass regrowth immediately after decay (already aligned in spirit), before movement.
+4. Move movement into a dedicated phase for both species before hunt/feeding resolution,
+so encounters depend on post-move positions (closer to `predpreygrass_rllib_env.py:407`).
+5. Convert engagement resolution to prey-centric order:
+for each live prey, first evaluate predator capture, then allow prey grass feeding if not
+captured (closer to `predpreygrass_rllib_env.py:1248`).
+Implemented in `predprey_public_goods/emerging_cooperation.py` (prey-centric
+capture-first, then feed/reproduce-if-alive loop).
+6. Add an explicit removal phase after engagements, instead of mixed inline removals.
+Implemented in `predprey_public_goods/emerging_cooperation.py` (prey/predator cleanup
+after engagement and update phases).
+7. Keep reproduction as the final ecological phase, using snapshots of currently alive
+agents to avoid same-tick chain births.
+8. Keep termination semantics as single-loop extinction/restart (no RLlib API migration)
+to avoid changing experiment scope.
+
+Deliberately unchanged in this plan:
+
+- Cooperation as inherited trait (no `join_hunt` action).
+- Existing hunt gate form (`energy_threshold_gate`).
+- Existing reward split mode toggle (`ALLOW_FREE_RIDING`).

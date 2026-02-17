@@ -31,6 +31,8 @@ and provides a theoretical interpretation using:
 16. Simulation Logic (Code-Level)
 17. One-Tick Worked Example (Visual)
 18. Comparison vs MARL Stag-Hunt (Updated)
+19. Hendry (2017) Links to This Model
+20. Three Concrete Experiments (Ready to Run)
 
 ------------------------------------------------------------------------
 
@@ -112,7 +114,8 @@ In this model:
 
 - Local birth and movement structure can keep positive assortment.
 - Benefit saturation is controlled by the hunt function via `P0`.
-- Per-tick cooperation cost (`COOP_COST * coop`) provides direct individual cost.
+- Per-tick cooperation cost (`COOP_COST * coop_expr`) provides direct individual
+  cost (`coop_expr=coop` when plasticity is off).
 
 Because `b` is state-dependent (group composition and `P0`), the net selection
 gradient is not globally positive. That matches the observed intermediate regime.
@@ -183,10 +186,17 @@ Observed in the current snapshot:
 
 # 7. Public Goods Game Structure (Current Implementation)
 
-The implemented hunt rule is public sharing among local hunters:
+The implemented hunt rule is trait-based public sharing among local hunters:
 
-- Kill probability increases with summed local contribution.
-- If a kill occurs, energy is split equally among hunters in that local group.
+- Hunters are assembled locally around each prey candidate.
+- A hard gate requires coop-weighted hunter power to exceed prey energy.
+- In `energy_threshold_gate` mode, success is additionally probabilistic:
+  `p_kill = 1 - (1 - P0)^sum(coop)`.
+- On success, captured prey energy is transferred to hunters (no fixed
+  synthetic kill reward).
+- Reward split mode is configurable:
+  - `ALLOW_FREE_RIDING=True`: equal split (free-riding possible).
+  - `ALLOW_FREE_RIDING=False`: contribution-weighted split.
 - Each predator still pays its own cooperation cost every tick.
 
 This creates a social-dilemma-like tension:
@@ -195,6 +205,43 @@ This creates a social-dilemma-like tension:
 - Individual marginal incentive can weaken as group contribution grows.
 
 That mechanism is compatible with stable intermediate cooperation.
+
+## Textbook PGG Mapping (Code Anchors)
+
+The model is not a one-shot matrix game, but its hunt module maps cleanly to
+public-goods components:
+
+| Public-goods element | Current model implementation |
+|---|---|
+| Players in a group | Predators in the local hunter pool around a focal prey (`HUNTER_POOL_R`) |
+| Individual contribution | `w_i = energy_i * [COOP_POWER_FLOOR + (1-COOP_POWER_FLOOR)*coop_i]` |
+| Public good production | Team power is aggregated and compared to prey energy (hard gate); optional extra probabilistic gate via `P0` |
+| Private contribution cost | Per-tick individual cost `COOP_COST * coop_expr_i` (plus general metabolic/move costs, with `coop_expr_i=coop_i` if plasticity is off) |
+| Group benefit size | Captured prey energy `E_prey` on successful hunt |
+| Benefit sharing rule | Equal split when `ALLOW_FREE_RIDING=True`; contribution-weighted when `ALLOW_FREE_RIDING=False` |
+| Free-rider channel | Under equal split, low contributors can receive more reward share than contribution share |
+| Evolutionary update | No learning policy; trait `coop` is inherited with mutation at reproduction |
+
+Interpretation:
+
+- This is a spatial, repeated, ecological public-goods game with endogenous
+  group formation and resource-coupled payoffs.
+- It is public-goods-like in mechanism, but richer than canonical static PGG
+  because survival, prey dynamics, grass, and reproduction feed back into payoffs.
+
+## Theory-to-Code Map (Intro Literature)
+
+| Reference | Main idea | Where it appears in this model |
+|---|---|---|
+| Hamilton (1964) | Inclusive-fitness style tradeoff (`r b > c`) | `c`: per-step private cost `COOP_COST * coop_expr` (`coop_expr=coop` if plasticity is off); `b`: higher local hunt success/payoff via coop-weighted team power; `r`-like structure: local neighborhoods (`HUNT_R`, `HUNTER_POOL_R`) |
+| Nowak (2006) | Rules for cooperation (especially spatial reciprocity) | Local interaction structure drives cooperative clustering and hunt outcomes; cooperation remains trait-based (`coop`) rather than action/learning based |
+| Okasha (2006), Frank (1998) | Multilevel / Price-style decomposition | Between-group proxy: local group hunt conversion; within-group proxy: private cooperation costs and split-gap diagnostics (`low_contrib_overpay`, `high_contrib_underpay`) |
+| Hendry (2017) | Eco-evolutionary feedbacks | Ecology: grass->prey->predator energy flows plus decay; evolution: inherited `coop`, mutation (`MUT_RATE`, `MUT_SIGMA`), selection via survival/reproduction |
+| Perc et al. (2017) | Statistical-physics framing of cooperation, especially public-goods and spatial pattern dynamics | Public-goods hunt mechanics, spatial neighborhoods, stochastic update order, and phase-like regime changes across parameter sweeps |
+
+This map is intentionally conceptual: the code is an ecological ABM, not an
+analytical closed-form model, but each theoretical construct has a direct
+mechanistic counterpart in the implementation.
 
 ------------------------------------------------------------------------
 
@@ -283,13 +330,23 @@ Core ecology/trait figures are generated from:
 
 Sweep figures are generated from:
 
-- `predprey_public_goods/sweep_p0_prey_repro.py`
+- `predprey_public_goods/sweep_coop_cost_p0.py`
 
-Animation layers:
+Animation views:
 
-- Base: local cooperation field.
-- Overlay: prey density (log-scaled, zeros masked).
-- Predators: open-circle markers with edge color = cooperation trait.
+- Disentangled 3-panel live view (`ANIMATE=True`):
+  panel 1 local cooperation heatmap,
+  panel 2 prey density heatmap (log-scaled, zeros masked),
+  panel 3 predator trait map (positions colored by cooperation),
+  each with its own legend/colorbar.
+- Optional simple live grid (`ANIMATE_SIMPLE_GRID=True`):
+  grass heatmap background with prey and predator markers.
+- Optional macro-flow figure (`PLOT_MACRO_ENERGY_FLOWS=True`):
+  per-tick channels
+  `photosynthesis->grass`, `grass->prey`, `prey->predator`,
+  `prey->decay`, `predator->decay`,
+  plus cumulative energy stocks per tick
+  (`grass`, `prey`, `predator`, and total sum).
 
 ------------------------------------------------------------------------
 
@@ -299,7 +356,7 @@ From repo root:
 
 ```bash
 ./.conda/bin/python predprey_public_goods/emerging_cooperation.py
-./.conda/bin/python predprey_public_goods/sweep_p0_prey_repro.py
+./.conda/bin/python predprey_public_goods/sweep_coop_cost_p0.py
 ```
 
 Notes:
@@ -316,27 +373,35 @@ Notes:
 Defaults in `predprey_public_goods/emerging_cooperation.py`:
 
 - Grid: `W=60`, `H=60`
-- Initial populations: `PRED_INIT=100`, `PREY_INIT=1400`
+- Initial populations: `PRED_INIT=100`, `PREY_INIT=500`
 - Predator initial energy: `PRED_ENERGY_INIT=1.7`
 - Steps: `STEPS=2500`
-- Predator costs: `METAB_PRED=0.052`, `MOVE_COST=0.008`, `COOP_COST=0.09`
-- Predator reproduction: `BIRTH_THRESH_PRED=4.2`, `PRED_REPRO_PROB=0.10`,
+- Predator costs: `METAB_PRED=0.052`, `MOVE_COST=0.008`, `COOP_COST=0.4`
+- Predator reproduction: `BIRTH_THRESH_PRED=4.2`, `PRED_REPRO_PROB=0.08`,
   `PRED_MAX=800`, `LOCAL_BIRTH_R=1`
 - Mutation: `MUT_RATE=0.03`, `MUT_SIGMA=0.08`
 - Hunt: `HUNT_RULE="energy_threshold_gate"`, `HUNT_R=1`,
-  `HUNTER_POOL_R=1`, `P0=0.24`, `KILL_ENERGY=3.8`, `COOP_POWER_FLOOR=0.35`
+  `HUNTER_POOL_R=1`, `P0=0.4`, `COOP_POWER_FLOOR=0.35`,
+  `ALLOW_FREE_RIDING=True`
+- Optional plasticity (default off, pure nature preserved):
+  `ENABLE_PLASTICITY=False`, `PLASTICITY_STRENGTH=0.25`,
+  `PLASTICITY_RATIO_SETPOINT=4.0`, `PLASTICITY_RATIO_SCALE=2.0`
+- Logging: `LOG_REWARD_SPLIT=True`, `LOG_ENERGY_BUDGET=True`,
+  `ENERGY_LOG_EVERY=1`, `ENERGY_INVARIANT_TOL=1e-6`
 - Prey: `PREY_MOVE_PROB=0.25`, `PREY_REPRO_PROB=0.058`, `PREY_MAX=3200`,
+  `PREY_ENERGY_MEAN=1.1`, `PREY_ENERGY_SIGMA=0.25`, `PREY_ENERGY_MIN=0.10`,
   `PREY_METAB=0.05`, `PREY_MOVE_COST=0.01`, `PREY_BIRTH_THRESH=2.0`,
   `PREY_BIRTH_SPLIT=0.36`, `PREY_BITE_SIZE=0.24`
 - Grass: `GRASS_INIT=0.8`, `GRASS_MAX=3.0`, `GRASS_REGROWTH=0.055`
 - Clustering radius: `CLUST_R=2`
 
-Defaults in `predprey_public_goods/sweep_p0_prey_repro.py`:
+Defaults in `predprey_public_goods/sweep_coop_cost_p0.py`:
 
 - `COOP_COST` range: `0.00-1.00` (step `0.01`)
 - `P0` range: `0.00-1.00` (step `0.01`)
-- `successes=10`, `max_attempts=100`, `tail_window=200`
-- Adaptive refinement: `rounds=3`, `top_k=5`, `refine_step_factor=0.5`
+- `successes=10`, `max_attempts=100`, `tail_window=200`, `steps=1500`
+- Adaptive defaults: `adaptive=False`, `rounds=3`, `top_k=5`,
+  `refine_step_factor=0.5`
 
 ------------------------------------------------------------------------
 
@@ -355,36 +420,108 @@ Defaults in `predprey_public_goods/sweep_p0_prey_repro.py`:
 
 This section summarizes the implemented hard-gate reward logic.
 
-For a local hunter set `g` around a candidate prey:
+For a candidate prey `v` and local hunter set `g`:
 
-- Trait sum: `S_g = sum_{j in g} c_j`
+- Expressed cooperation trait:
+  `c_j^expr(t) = clamp01(c_j + Delta_plast(t))`
+- Trait sum: `S_g = sum_{j in g} c_j^expr(t)`
 - Cooperative power:
-  `P_g = sum_{j in g} e_j * [alpha + (1 - alpha) c_j]`,
+  `P_g = sum_{j in g} e_j * [alpha + (1 - alpha) c_j^expr(t)]`
   with `alpha = COOP_POWER_FLOOR`
-- Prey energy threshold: `E_prey`
+- Captured prey energy: `E_v`
+
+Plasticity shift (optional, deterministic, trait-based):
+
+- If `ENABLE_PLASTICITY=False`: `Delta_plast(t)=0`
+- If `ENABLE_PLASTICITY=True`:
+  `Delta_plast(t)=PLASTICITY_STRENGTH * tanh((prey/pred - setpoint)/scale)`
 
 Gate 1 (hard constraint):
 
-`P_g >= E_prey`
+`P_g >= E_v`
 
 Gate 2 (probabilistic success in `energy_threshold_gate` mode):
 
 `p_kill(S_g) = 1 - (1 - p0)^(S_g)`
 
-If both gates pass, kill energy is shared equally:
+If both gates pass, captured prey energy is distributed:
 
-`G_i = KILL_ENERGY / n_g`
+- Equal split mode (`ALLOW_FREE_RIDING=True`):
+  `G_i = E_v / n_g`
+- Contribution-weighted mode (`ALLOW_FREE_RIDING=False`):
+  `G_i = E_v * w_i / sum_{j in g} w_j`,
+  with `w_i = e_i * [alpha + (1 - alpha) c_i]`
 
 Per-tick predator cost:
 
-`C_i = METAB_PRED + MOVE_COST + COOP_COST * c_i`
+`C_i = METAB_PRED + MOVE_COST + COOP_COST * c_i^expr(t)`
 
 A local fitness proxy under gate mode is therefore:
 
-`W_i ~ I(P_g >= E_prey) * p_kill(S_g) * (KILL_ENERGY / n_g) - C_i`
+`W_i ~ I(P_g >= E_v) * p_kill(S_g) * G_i - C_i`
 
 Because benefits are both thresholded and saturating while costs are linear in
 `c_i`, interior cooperation regimes remain expected.
+
+## Compact Equations (Code Variable Names)
+
+For predator `i` in local hunter set `g`:
+
+`coop_expr_i = clamp01(coop_i + Delta_plast(t))`
+
+`w_i = energy_i * [COOP_POWER_FLOOR + (1 - COOP_POWER_FLOOR) * coop_expr_i]`
+
+`W_g = sum_{i in g} w_i`
+
+`S_g = sum_{i in g} coop_expr_i`
+
+For prey with energy `E_prey`:
+
+`p_kill = 0, if W_g < E_prey`
+
+`p_kill = 1, if HUNT_RULE == "energy_threshold" and W_g >= E_prey`
+
+`p_kill = 1 - (1 - P0)^(S_g), if HUNT_RULE == "energy_threshold_gate" and W_g >= E_prey`
+
+On successful capture:
+
+`E_pool = E_prey`
+
+`gain_i = E_pool / n_hunters`, if `ALLOW_FREE_RIDING=True`
+
+`gain_i = E_pool * w_i / sum_{j in g} w_j`, if `ALLOW_FREE_RIDING=False`
+
+Per-step predator private cost:
+
+`cost_i = METAB_PRED + MOVE_COST + COOP_COST * coop_expr_i` (applied via clamped drains)
+
+Core macro flow channels per tick:
+
+`photosynthesis_to_grass = grass_regen`
+
+`grass_to_prey = sum(bite_i)`, with `bite_i = min(PREY_BITE_SIZE, grass_cell_i)`
+
+`prey_to_predator = sum(E_prey over successful kills)`
+
+`prey_to_decay = prey_metab_loss + prey_move_loss`
+
+`predator_to_decay = pred_metab_loss + pred_move_loss + pred_coop_loss`
+
+Energy-balance identity checked each tick:
+
+`delta_total = grass_regen - (prey_to_decay + predator_to_decay) + residual`
+
+with `residual` expected near zero (tracked against `ENERGY_INVARIANT_TOL`).
+
+Cumulative stock view (net balance in plots):
+
+`E_grass(t) = sum(grass[y, x])`
+
+`E_prey(t) = sum(prey.energy)`
+
+`E_predator(t) = sum(predator.energy)`
+
+`E_total(t) = E_grass(t) + E_prey(t) + E_predator(t)`
 
 ------------------------------------------------------------------------
 
@@ -404,17 +541,22 @@ This section documents the exact update order used in
 ## Per-Tick Update Order
 
 1. Grass regrowth (`GRASS_REGROWTH`, capped by `GRASS_MAX`).
-2. Prey movement, energy costs, grass consumption, prey reproduction.
+2. Prey phase: movement, clamped energy costs, single grass bite, reproduction.
 3. Build spatial indexes for prey and predators.
-4. Predator hunting and energy gain.
-5. Remove killed prey.
-6. Predator costs, movement, reproduction, mutation, death.
+4. Optional deterministic trait expression shift (if `ENABLE_PLASTICITY=True`):
+   compute `coop_expr = clamp01(coop + Delta_plast)` from prey/pred ratio.
+5. Prey-centric engagement resolution (capture only; uses `coop_expr`).
+6. Explicit prey cleanup (starved + hunted), then append prey newborns.
+7. Predator phase: clamped costs, movement, reproduction, mutation, cleanup
+   (cooperation cost uses `coop_expr` when plasticity is enabled).
+8. Optional run-level diagnostics: reward split and energy-budget invariant.
 
 ## Prey Dynamics
 
 - Each prey moves with probability `PREY_MOVE_PROB` by a local step in
   `{ -1, 0, 1 }` for x and y.
-- Each prey pays `PREY_METAB` and (if moved) `PREY_MOVE_COST`.
+- Each prey pays `PREY_METAB` and (if moved) `PREY_MOVE_COST` via clamped
+  drains (`drain_energy`), so paid cost cannot exceed current energy.
 - Each prey consumes grass at its cell up to `PREY_BITE_SIZE`.
 - Prey with `energy <= 0` are removed.
 - Reproduction is density-limited by:
@@ -423,24 +565,27 @@ This section documents the exact update order used in
   `PREY_REPRO_PROB * repro_scale`.
 - On birth, child gets `PREY_BIRTH_SPLIT * parent_energy` and the parent loses
   that energy.
+- Newborn prey are buffered and appended only after engagements, so they act
+  from the next tick.
 
 ## Hunting Logic
 
-- Predators are grouped by current cell.
-- For each predator-occupied cell `(cx, cy)`, candidate prey are collected from
-  all cells in a square neighborhood radius `HUNT_R` (Chebyshev radius).
+- Engagements iterate over live prey (prey-centric order).
+- Candidate hunters are collected from cells in square neighborhood radius
+  `HUNT_R` (Chebyshev radius) around each prey.
 - Hunters are pooled around each victim using `HUNTER_POOL_R`.
 - Hard gate: cooperative weighted power must exceed prey energy.
 - In `energy_threshold_gate` mode, an additional probabilistic gate is applied:
-  `p_kill = 1 - (1 - P0)^S` with `S = sum(coop_i)`.
-- If a kill occurs, one prey candidate is removed.
-- Kill reward is shared equally among hunters:
-  `share = KILL_ENERGY / n_hunters`.
+  `p_kill = 1 - (1 - P0)^S` with `S = sum(coop_expr_i)`.
+- If a kill occurs, prey energy is transferred to hunters.
+- Split is equal when `ALLOW_FREE_RIDING=True`, otherwise
+  contribution-weighted.
 
 ## Predator Energy, Reproduction, Mutation
 
 - Each predator pays per tick:
-  `METAB_PRED + MOVE_COST + COOP_COST * coop`.
+  `METAB_PRED + MOVE_COST + COOP_COST * coop_expr` via clamped drains
+  (`coop_expr=coop` when plasticity is disabled).
 - Predators then move by a local wrapped step.
 - Reproduction is thresholded and probabilistic:
   `energy >= BIRTH_THRESH_PRED` and
@@ -459,6 +604,16 @@ This section documents the exact update order used in
   `prey_n == 0`); this is an extinction run.
 - A run is marked successful only if no extinction occurs before `STEPS`.
 - With `RESTART_ON_EXTINCTION=True`, `main()` retries up to `MAX_RESTARTS`.
+- If enabled, the run logs:
+  - reward split metrics (kills, inequality, overpay/underpay diagnostics),
+  - per-step energy budget fields:
+    `d_total`, `grass_in`, `grass_to_prey`, `prey_to_pred`, `dissipative_loss`,
+    expected delta, and residual with `[OK]/[WARN]` against
+    `ENERGY_INVARIANT_TOL`,
+  - run-level flow totals:
+    `grass_regen`, `grass_to_prey`, `prey_to_pred`,
+    `prey_birth_transfer`, `pred_birth_transfer`, and all dissipative
+    subcomponents.
 - Recorded outputs include:
   predator count history, prey count history, mean/variance cooperation history,
   optional animation snapshots, final predator list, `success` flag, and
@@ -509,6 +664,8 @@ What is now aligned more closely with the MARL ecology:
 - Grass is explicit, regrows each tick, and is consumed by prey.
 - Predator reproduction is energy-driven with additional regulation.
 - Cooperative hunt uses local pooling plus energy-threshold gating.
+- Engagement order is prey-centric with explicit cleanup phases.
+- Hunt reward is transferred from captured prey energy (no fixed kill reward).
 
 What still differs (beyond the intended trait-vs-action distinction):
 
@@ -517,3 +674,110 @@ What still differs (beyond the intended trait-vs-action distinction):
 - No bounded-grid wall/LOS movement constraints.
 - Single-species predator + scalar trait evolution, rather than typed MARL agent
   populations.
+
+------------------------------------------------------------------------
+
+# 19. Hendry (2017) Links to This Model
+
+The model supports several core eco-evolutionary patterns discussed in Hendry's
+intro framework, with direct code-level hooks:
+
+| Hendry theme | Code-level mechanism here | Primary observables |
+|---|---|---|
+| Ecology-evolution feedback | Predator trait `coop` changes hunt conversion, which changes predator/prey/grass densities, which changes selection | `mean_coop_hist`, `pred_hist`, `prey_hist`, macro energy stocks |
+| Selection under density dependence | Predator reproduction scales by crowding and prey availability (`pred_repro_scale`) | predator persistence, extinction timing, oscillation amplitude |
+| Heritable trait + mutation | Offspring inherit `coop` with mutation (`MUT_RATE`, `MUT_SIGMA`) | trait mean/variance trajectories |
+| Resource-mediated fitness | Energy transfer chain grass->prey->predator with dissipative decay | `grass_to_prey`, `prey_to_pred`, `prey_decay`, `pred_decay` |
+| Spatial structure | Local hunt pools (`HUNT_R`, `HUNTER_POOL_R`) and local birth | clustering heatmap, local coexistence patterns |
+| Plasticity vs genetic response | Optional deterministic reaction norm (`ENABLE_PLASTICITY`) without adding an action policy | `flow_hist['coop_shift']`, trait-vs-expression comparisons |
+
+Interpretation boundary:
+
+- This remains an ABM, not an analytical derivation of Hendry models.
+- The mapping is mechanism-level: same causal ingredients, different formalism.
+
+## Perc et al. (2017) Direct Links
+
+- Main article (DOI): [https://doi.org/10.1016/j.physrep.2017.05.004](https://doi.org/10.1016/j.physrep.2017.05.004)
+- Local copy used here:
+  `/home/doesburg/Dropbox/00. Planning/00. Lopende zaken/HBP/research HBP/Research_current_eco_evolution_simulation/Perc_et_al_Physics_Reports_2017.pdf`
+
+## Perc Sections Most Relevant to This Simulation
+
+| Perc section | Why it maps to this model | Where to inspect in code |
+|---|---|---|
+| 3.1 Public goods game as null model (p.11) | Your hunt interaction is a repeated, local public-goods mechanism | `HUNT_RULE`, `HUNTER_POOL_R`, `ALLOW_FREE_RIDING` |
+| 4 Monte Carlo methods (pp.15-18) | Stochastic sequential updates and random local movement in each tick | `step_world()`, prey/predator shuffle and random moves |
+| 5 Peer-based strategies (pp.20-24) | Local interaction and clustering effects on cooperative outcomes | `compute_local_clustering_field()`, prey-centric local engagements |
+| 7 Self-organization of incentives (pp.29-32) | Endogenous reward/cost structure from energy transfers and costs | prey-energy capture, `COOP_COST`, energy-flow diagnostics |
+| 9 Tolerance and cooperation (pp.38-40) | Coexistence regimes and interior cooperation levels instead of fixation | sweep heatmaps and long-run `mean_coop_hist` behavior |
+
+------------------------------------------------------------------------
+
+# 20. Three Concrete Experiments (Ready to Run)
+
+Each experiment is designed to isolate one mechanism while preserving the core
+nature framing (trait-based cooperation).
+
+## Experiment A: Pure Nature vs Nature+Plasticity
+
+Question: does deterministic expression plasticity stabilize coexistence or just
+shift trait means?
+
+Setups:
+
+- A1 (baseline): `ENABLE_PLASTICITY=False`
+- A2 (plastic): `ENABLE_PLASTICITY=True`, keep default plasticity parameters
+
+Compare:
+
+- extinction rate over replicated seeds,
+- `mean_coop_hist` tail mean,
+- mean `coop_shift`,
+- energy-flow channels and total stock drift.
+
+Expected signature:
+
+- A2 should shift short-run expressed cooperation with ecology (prey/pred ratio),
+  while long-run genetic `coop` may move less than expression.
+
+## Experiment B: Cost-Sensitivity of Cooperation
+
+Question: where does cooperation collapse under private cost pressure?
+
+Setups:
+
+- Run sweep script with current logic:
+  `./.conda/bin/python predprey_public_goods/sweep_coop_cost_p0.py`
+- Focus on `COOP_COST` axis at fixed `P0` slices.
+
+Compare:
+
+- tail mean cooperation,
+- coexistence frequency (successful runs),
+- reward split diagnostics (`mean_low_contrib_overpay`).
+
+Expected signature:
+
+- higher `COOP_COST` lowers mean cooperation and narrows coexistence regime.
+
+## Experiment C: Free-Riding Regime Switch
+
+Question: does equal sharing vs contribution-weighted sharing alter selective
+pressure on low contributors?
+
+Setups:
+
+- C1: `ALLOW_FREE_RIDING=True` (equal split)
+- C2: `ALLOW_FREE_RIDING=False` (contribution-weighted)
+
+Compare:
+
+- `mean_low_contrib_overpay` and `mean_high_contrib_underpay`,
+- long-run mean cooperation,
+- predator persistence and oscillation shape.
+
+Expected signature:
+
+- C1 should increase overpay to low contributors and weaken selection for high
+  cooperation relative to C2.
