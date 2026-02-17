@@ -126,7 +126,9 @@ gradient is not globally positive. That matches the observed intermediate regime
 
 A standard decomposition is:
 
-`Delta z = Cov_group(W_g, z_g)/Wbar + E_g[Cov_ind(W_i, z_i)]/Wbar`
+$$
+\Delta \bar{z}=\frac{\operatorname{Cov}_g(W_g,z_g)}{\bar{W}}+\frac{\mathbb{E}_g\!\left[\operatorname{Cov}_i(W_i,z_i)\right]}{\bar{W}}
+$$
 
 Interpretation for this system:
 
@@ -144,7 +146,9 @@ not necessarily fix at 1.0.
 
 At population level:
 
-`Delta z = Cov(W, z)/Wbar + E(W Delta z_transmission)/Wbar`
+$$
+\Delta \bar{z}=\frac{\operatorname{Cov}(W,z)}{\bar{W}}+\frac{\mathbb{E}\!\left[W\,\Delta z_{\mathrm{transmission}}\right]}{\bar{W}}
+$$
 
 With mutation, spatial turnover, and ecological fluctuations, the covariance term
 can be positive in some states and weak/negative in others.
