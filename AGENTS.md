@@ -9,6 +9,11 @@ These instructions apply when working in this repository.
 - Prefer running scripts and checks from repo root:
   - `/home/doesburg/Projects/SocialBehavior`
 
+## Parameters
+
+- Don't use CLI style parameters
+- Use and define parameters inside script
+
 ## Communication Style
 
 - Keep answers concise and technical.

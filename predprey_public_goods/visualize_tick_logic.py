@@ -71,14 +71,32 @@ def _panel_frame(parts: list[str], x: int, y: int, w: int, h: int, title: str) -
     )
 
 
-def _text(parts: list[str], x: float, y: float, txt: str, size: int = 14, weight: str = "400", color: str = "#222222", family: str = "Arial") -> None:
+def _text(
+    parts: list[str],
+    x: float,
+    y: float,
+    txt: str,
+    size: int = 14,
+    weight: str = "400",
+    color: str = "#222222",
+    family: str = "Arial",
+) -> None:
     parts.append(
         f'<text x="{x}" y="{y}" font-family="{family}" font-size="{size}" '
         f'font-weight="{weight}" fill="{color}">{escape(txt)}</text>'
     )
 
 
-def _line(parts: list[str], x1: float, y1: float, x2: float, y2: float, color: str = "#999999", width: float = 1.0, dash: str | None = None) -> None:
+def _line(
+    parts: list[str],
+    x1: float,
+    y1: float,
+    x2: float,
+    y2: float,
+    color: str = "#999999",
+    width: float = 1.0,
+    dash: str | None = None,
+) -> None:
     dash_attr = f' stroke-dasharray="{dash}"' if dash else ""
     parts.append(
         f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{color}" '
@@ -86,7 +104,17 @@ def _line(parts: list[str], x1: float, y1: float, x2: float, y2: float, color: s
     )
 
 
-def _rect(parts: list[str], x: float, y: float, w: float, h: float, fill: str, stroke: str = "none", sw: float = 0.0, rx: int = 0) -> None:
+def _rect(
+    parts: list[str],
+    x: float,
+    y: float,
+    w: float,
+    h: float,
+    fill: str,
+    stroke: str = "none",
+    sw: float = 0.0,
+    rx: int = 0,
+) -> None:
     parts.append(
         f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{fill}" '
         f'stroke="{stroke}" stroke-width="{sw}" rx="{rx}" />'
@@ -152,7 +180,16 @@ def plot_tick_example(outfile: Path) -> None:
     rule_y = y + 200
     _text(parts, x + 20, rule_y, "Hunt rule: p_kill = 1 - (1 - P0)^S", size=15, family="Courier New")
     _text(parts, x + 20, rule_y + 26, f"P0={ex['p0']:.2f}, S=sum(coop)={ex['s']:.1f}", size=15, family="Courier New")
-    _text(parts, x + 20, rule_y + 52, f"p_kill={ex['p_kill']:.3f}", size=15, family="Courier New", weight="700", color="#1c4e80")
+    _text(
+        parts,
+        x + 20,
+        rule_y + 52,
+        f"p_kill={ex['p_kill']:.3f}",
+        size=15,
+        family="Courier New",
+        weight="700",
+        color="#1c4e80",
+    )
 
     # Panel 2 content
     x, y, w, h = p2
@@ -198,7 +235,8 @@ def plot_tick_example(outfile: Path) -> None:
         _text(parts, gx - 52, ch_y + ch_h + 24, "Initial", size=11, color="#3f6f6a")
         _text(parts, gx + 2, ch_y + ch_h + 24, "Final", size=11, color="#2e6a2c")
         _text(parts, gx - 13, ch_y + ch_h + 44, name, size=13, weight="700")
-        _text(parts, gx - 46, ch_y + ch_h - max(h0, h1) - 10, f"+{ex['share']:.3f}  -{ex['costs'][i]:.3f}", size=11, color="#333333")
+        label = f"+{ex['share']:.3f}  -{ex['costs'][i]:.3f}"
+        _text(parts, gx - 46, ch_y + ch_h - max(h0, h1) - 10, label, size=11, color="#333333")
 
     _text(parts, x + 20, y + 300, "Per-tick cost = METAB + MOVE + COOP_COST * coop", size=13, family="Courier New")
 

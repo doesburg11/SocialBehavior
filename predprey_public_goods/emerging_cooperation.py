@@ -117,7 +117,7 @@ PRED_EDGE_LINEWIDTH = 1.2
 PREY_DENSITY_ALPHA = 0.35   # overlay strength
 CLUSTER_ALPHA = 1.0         # base clustering heatmap alpha
 
-SEED = None                 # set to int for reproducibility (e.g. 42)
+SEED = 42                 # set to int for reproducibility (e.g. 42)
 RESTART_ON_EXTINCTION = True
 MAX_RESTARTS = 60           # max additional attempts if extinction occurs early
 
