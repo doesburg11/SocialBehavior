@@ -21,14 +21,17 @@ These instructions apply when working in this repository.
   `1-3` concrete next-step suggestions as a numbered list.
 - When comparing implementations, emphasize meaningful mechanism differences and
   avoid listing trivial incidental differences.
+- If a meaninful chance in the code has been made, give a detailed and stepwise update in the accompanied README.md
 
 ## Project-Specific Modeling Preference
 
-- For `predprey_public_goods/emerging_cooperation.py` vs MARL stag-hunt
-  comparisons, treat this as an intentional core distinction:
-  - `emerging_cooperation`: cooperation is trait-based (`nature` framing).
-  - MARL stag-hunt: cooperation is action-based (`nurture` framing).
-- Keep that distinction explicit, and focus comparisons on other remaining gaps.
+- For `/home/doesburg/Projects/SocialBehavior/predpreygrass_hamilton/predpreygrass_hamilton.py` the goal is
+to mimic human evolution as close as possible to reality:
+  - prdators ar humans
+  - prey are deer
+  - sexual reproduction
+  - kin recognition cue
+  - children are dependant on parent or related family for reproduction
 
 ## Validation Expectations
 
