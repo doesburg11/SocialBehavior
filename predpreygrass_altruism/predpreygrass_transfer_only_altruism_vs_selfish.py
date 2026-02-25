@@ -19,7 +19,7 @@ from __future__ import annotations
 import csv
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, List, Tuple
+from typing import TYPE_CHECKING, Dict, List, Sequence, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -152,6 +152,9 @@ SHOW_PLOTS = False
 PLOT_DPI = 180
 
 # Minimal paired comparison helper for the two transfer recipient modes.
+# Rerun archived comparisons (set these two lines, then run the script):
+# RUN_TWO_MODE_COMPARISON = True
+# COMPARISON_SEED_BASE = 20260224  # or 20270401; use None for default `SEED = 122913`
 RUN_TWO_MODE_COMPARISON = False
 SAVE_TWO_MODE_COMPARISON_ARTIFACTS = True
 # Example archived robustness seed bases used with this helper:
