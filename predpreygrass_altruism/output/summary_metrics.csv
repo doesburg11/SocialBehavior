@@ -1,0 +1,2 @@
+runs,final_altruist_mean,final_selfish_mean,final_prey_mean,selfish_extinction_rate,selfish_extinction_step_mean,selfish_near_zero_tail_mean,coexistence_tail_mean,predator_prey_coexistence_tail_mean,tail_altruist_mean,tail_selfish_mean,tail_prey_mean,tail_altruist_frequency_mean,mean_transfers_per_tick
+1,365.0,0.0,4812.0,1.0,476.0,0.1590909090909091,1.0,1.0,231.23181818181817,24.85,5289.595454545454,0.8962544731434808,16.416

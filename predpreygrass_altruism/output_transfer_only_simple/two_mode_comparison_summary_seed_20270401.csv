@@ -1,0 +1,3 @@
+mode,runs,final_altruist_mean,final_selfish_mean,final_prey_mean,selfish_extinction_rate,selfish_extinction_step_mean,selfish_absorbing_extinction_step_mean,selfish_near_zero_tail_mean,coexistence_tail_mean,predator_prey_coexistence_tail_mean,tail_altruist_mean,tail_selfish_mean,tail_prey_mean,tail_altruist_frequency_mean,mean_transfers_per_tick
+altruist_only,10,424.2,0.0,5018.7,1.0,172.5,172.5,1.0,1.0,1.0,424.32,0.0,4916.0590909090915,1.0,718.4889999999999
+any_predator,10,0.0,247.0,5263.9,0.0,nan,nan,0.0,0.030909090909090907,1.0,0.2059090909090909,264.1227272727273,5203.72,0.0006838327827452683,23.809800000000003

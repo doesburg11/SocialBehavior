@@ -22,6 +22,7 @@ These instructions apply when working in this repository.
 - When comparing implementations, emphasize meaningful mechanism differences and
   avoid listing trivial incidental differences.
 - If a meaninful chance in the code has been made, give a detailed and stepwise update in the accompanied README.md
+- If asked to explain something, not only give formulas, but also explain variables in detail.
 
 ## Project-Specific Modeling Preference
 
